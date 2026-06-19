@@ -2,12 +2,308 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { BarChart3, Bookmark, CheckCircle2, ShieldCheck } from 'lucide-react';
+import {
+  BarChart3,
+  Bookmark,
+  CheckCircle2,
+  ShieldCheck,
+} from 'lucide-react';
 import PromptCard from '@/components/prompts/PromptCard.js';
 import { formatNumber, initials } from '@/libs/utils.js';
 
-const benefits = [[CheckCircle2,'Curated prompts','Approved prompt marketplace with admin moderation.'],[Bookmark,'Bookmark easily','Save favorite prompts with duplicate prevention.'],[BarChart3,'Creator analytics','Track copies, bookmarks and prompt growth.'],[ShieldCheck,'Role security','User, creator and admin access enforced by the API.']];
-export function FeaturedSection({ prompts }) { return <motion.section id="featured" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="px-4 py-16 sm:px-6 lg:px-8"><div className="mx-auto max-w-7xl"><p className="section-label">Popular this week</p><h2 className="mt-3 font-display text-4xl font-black sm:text-5xl">Featured prompts that perform</h2><div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{prompts?.map((prompt) => <PromptCard key={prompt._id} prompt={prompt} />)}{prompts?.length === 0 ? <p className="soft-card rounded-3xl p-6 muted">No featured prompts are approved yet.</p> : null}</div></div></motion.section>; }
-export function BenefitsSection() { return <section className="px-4 py-16"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.8fr_1.2fr]"><div><p className="section-label">Why choose us</p><h2 className="mt-3 font-display text-4xl font-black sm:text-5xl">A secure prompt ecosystem for users and creators</h2></div><div className="grid gap-5 md:grid-cols-2">{benefits.map(([Icon, title, text]) => <div key={title} className="hard-card rounded-3xl p-6"><Icon size={32} /><h3 className="mt-4 font-display text-2xl font-black">{title}</h3><p className="mt-2 text-sm leading-7 muted">{text}</p></div>)}</div></div></section>; }
-export function CommunitySection({ creators, reviews }) { return <motion.section id="creators" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="px-4 py-16"><div className="mx-auto max-w-7xl"><p className="section-label">Creator marketplace</p><h2 className="mt-3 font-display text-4xl font-black sm:text-5xl">Top Creators</h2><div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">{creators?.map((item) => <div className="hard-card rounded-3xl p-6 text-center" key={item.user._id}><div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-pink-500 text-2xl font-black text-white">{initials(item.user.name)}</div><h3 className="mt-4 font-display text-xl font-black">{item.user.name}</h3><p className="text-sm muted">{item.prompts} prompts · {formatNumber(item.copies)} copies · ★ {Number(item.rating || 0).toFixed(1)}</p></div>)}{creators?.length === 0 ? <p className="muted">No creators have approved prompts yet.</p> : null}</div><div className="mt-14 grid gap-6 lg:grid-cols-3"><div><p className="section-label">Customer reviews</p><h2 className="mt-3 font-display text-4xl font-black">What users say</h2></div><div className="grid gap-5 md:grid-cols-2 lg:col-span-2">{reviews?.map((review) => <div className="hard-card rounded-3xl p-6" key={review._id}><div className="text-yellow-500">{'★'.repeat(review.rating)}</div><p className="mt-4 text-sm leading-7 muted">“{review.comment}”</p><h4 className="mt-4 font-black">{review.user?.name}</h4></div>)}{reviews?.length === 0 ? <p className="muted">No reviews have been submitted yet.</p> : null}</div></div></div></motion.section>; }
-export function ExtraSections({ categories }) { return <><motion.section initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="px-4 py-16"><div className="hard-card mx-auto max-w-7xl rounded-[2rem] p-6"><p className="section-label">Explore by category</p><h2 className="mt-3 font-display text-4xl font-black">Popular Categories</h2><div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{categories?.map((category) => <Link href={`/all-prompts?category=${encodeURIComponent(category)}`} className="badge justify-center py-4" key={category}>{category}</Link>)}{categories?.length === 0 ? <p className="muted">Categories appear after prompts are approved.</p> : null}</div></div></motion.section><motion.section initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="px-4 py-16"><div className="mx-auto max-w-7xl"><p className="section-label">How it works</p><h2 className="mt-3 max-w-3xl font-display text-4xl font-black sm:text-5xl">From a useful idea to an approved marketplace prompt</h2><div className="mt-8 grid gap-5 md:grid-cols-3">{[['01','Create','Write the prompt, usage instructions and upload its thumbnail.'],['02','Moderate','An admin reviews quality and provides feedback when changes are needed.'],['03','Discover','Approved prompts become searchable, bookmarkable, reviewable and measurable.']].map(([number, title, copy]) => <article key={number} className="hard-card rounded-3xl p-6"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--lime)] font-black text-slate-950">{number}</span><h3 className="mt-5 font-display text-2xl font-black">{title}</h3><p className="mt-2 text-sm leading-7 muted">{copy}</p></article>)}</div></div></motion.section></>; }
+// Benefits data used in the benefits section cards
+const benefits = [
+  [
+    CheckCircle2,
+    'Curated prompts',
+    'Approved prompt marketplace with admin moderation.',
+  ],
+  [
+    Bookmark,
+    'Bookmark easily',
+    'Save favorite prompts with duplicate prevention.',
+  ],
+  [
+    BarChart3,
+    'Creator analytics',
+    'Track copies, bookmarks and prompt growth.',
+  ],
+  [
+    ShieldCheck,
+    'Role security',
+    'User, creator and admin access enforced by the API.',
+  ],
+];
+
+export function FeaturedSection({ prompts }) {
+  return (
+    <motion.section
+      id="featured"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      className="px-4 py-16 sm:px-6 lg:px-8"
+    >
+      <div className="mx-auto max-w-7xl">
+        <p className="section-label">
+          Popular this week
+        </p>
+
+        <h2 className="mt-3 font-display text-4xl font-black sm:text-5xl">
+          Featured prompts that perform
+        </h2>
+
+        {/* Featured prompt cards */}
+        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {prompts?.map((prompt) => (
+            <PromptCard
+              key={prompt._id}
+              prompt={prompt}
+            />
+          ))}
+
+          {/* Empty message if no featured prompts are available */}
+          {prompts?.length === 0 ? (
+            <p className="soft-card rounded-3xl p-6 muted">
+              No featured prompts are approved yet.
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+export function BenefitsSection() {
+  return (
+    <section className="px-4 py-16">
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.8fr_1.2fr]">
+        {/* Left side heading */}
+        <div>
+          <p className="section-label">
+            Why choose us
+          </p>
+
+          <h2 className="mt-3 font-display text-4xl font-black sm:text-5xl">
+            A secure prompt ecosystem for users and creators
+          </h2>
+        </div>
+
+        {/* Benefit cards */}
+        <div className="grid gap-5 md:grid-cols-2">
+          {benefits.map(([Icon, title, text]) => (
+            <div
+              key={title}
+              className="hard-card rounded-3xl p-6"
+            >
+              <Icon size={32} />
+
+              <h3 className="mt-4 font-display text-2xl font-black">
+                {title}
+              </h3>
+
+              <p className="mt-2 text-sm leading-7 muted">
+                {text}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function CommunitySection({ creators, reviews }) {
+  return (
+    <motion.section
+      id="creators"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="px-4 py-16"
+    >
+      <div className="mx-auto max-w-7xl">
+        <p className="section-label">
+          Creator marketplace
+        </p>
+
+        <h2 className="mt-3 font-display text-4xl font-black sm:text-5xl">
+          Top Creators
+        </h2>
+
+        {/* Top creator cards */}
+        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {creators?.map((item) => (
+            <div
+              className="hard-card rounded-3xl p-6 text-center"
+              key={item.user._id}
+            >
+              {/* Creator avatar using initials */}
+              <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-pink-500 text-2xl font-black text-white">
+                {initials(item.user.name)}
+              </div>
+
+              <h3 className="mt-4 font-display text-xl font-black">
+                {item.user.name}
+              </h3>
+
+              <p className="text-sm muted">
+                {item.prompts} prompts · {formatNumber(item.copies)} copies · ★{' '}
+                {Number(item.rating || 0).toFixed(1)}
+              </p>
+            </div>
+          ))}
+
+          {/* Empty message if there are no creators */}
+          {creators?.length === 0 ? (
+            <p className="muted">
+              No creators have approved prompts yet.
+            </p>
+          ) : null}
+        </div>
+
+        {/* Reviews section */}
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+          <div>
+            <p className="section-label">
+              Customer reviews
+            </p>
+
+            <h2 className="mt-3 font-display text-4xl font-black">
+              What users say
+            </h2>
+          </div>
+
+          {/* Review cards */}
+          <div className="grid gap-5 md:grid-cols-2 lg:col-span-2">
+            {reviews?.map((review) => (
+              <div
+                className="hard-card rounded-3xl p-6"
+                key={review._id}
+              >
+                <div className="text-yellow-500">
+                  {'★'.repeat(review.rating)}
+                </div>
+
+                <p className="mt-4 text-sm leading-7 muted">
+                  “{review.comment}”
+                </p>
+
+                <h4 className="mt-4 font-black">
+                  {review.user?.name}
+                </h4>
+              </div>
+            ))}
+
+            {/* Empty message if there are no reviews */}
+            {reviews?.length === 0 ? (
+              <p className="muted">
+                No reviews have been submitted yet.
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+export function ExtraSections({ categories }) {
+  return (
+    <>
+      {/* Category section */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="px-4 py-16"
+      >
+        <div className="hard-card mx-auto max-w-7xl rounded-[2rem] p-6">
+          <p className="section-label">
+            Explore by category
+          </p>
+
+          <h2 className="mt-3 font-display text-4xl font-black">
+            Popular Categories
+          </h2>
+
+          {/* Category links */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {categories?.map((category) => (
+              <Link
+                href={`/all-prompts?category=${encodeURIComponent(category)}`}
+                className="badge justify-center py-4"
+                key={category}
+              >
+                {category}
+              </Link>
+            ))}
+
+            {/* Empty message if categories are not available */}
+            {categories?.length === 0 ? (
+              <p className="muted">
+                Categories appear after prompts are approved.
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* How it works section */}
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="px-4 py-16"
+      >
+        <div className="mx-auto max-w-7xl">
+          <p className="section-label">
+            How it works
+          </p>
+
+          <h2 className="mt-3 max-w-3xl font-display text-4xl font-black sm:text-5xl">
+            From a useful idea to an approved marketplace prompt
+          </h2>
+
+          {/* Steps of the marketplace process */}
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {[
+              [
+                '01',
+                'Create',
+                'Write the prompt, usage instructions and upload its thumbnail.',
+              ],
+              [
+                '02',
+                'Moderate',
+                'An admin reviews quality and provides feedback when changes are needed.',
+              ],
+              [
+                '03',
+                'Discover',
+                'Approved prompts become searchable, bookmarkable, reviewable and measurable.',
+              ],
+            ].map(([number, title, copy]) => (
+              <article
+                key={number}
+                className="hard-card rounded-3xl p-6"
+              >
+                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--lime)] font-black text-slate-950">
+                  {number}
+                </span>
+
+                <h3 className="mt-5 font-display text-2xl font-black">
+                  {title}
+                </h3>
+
+                <p className="mt-2 text-sm leading-7 muted">
+                  {copy}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+    </>
+  );
+}
