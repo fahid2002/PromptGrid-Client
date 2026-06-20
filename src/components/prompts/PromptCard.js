@@ -4,7 +4,6 @@ import Link from 'next/link';
 import {
   Bookmark,
   LockKeyhole,
-  Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -12,6 +11,7 @@ import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
 import { useAuth } from '@/libs/auth-context.js';
 import { formatNumber } from '@/libs/utils.js';
+import { AiToolLogo } from './AiToolLogo.js';
 
 export default function PromptCard({ prompt }) {
   // Get logged-in user from auth context
@@ -51,7 +51,7 @@ export default function PromptCard({ prompt }) {
           {prompt.visibility === 'private' ? (
             <LockKeyhole />
           ) : (
-            <Sparkles />
+            <AiToolLogo tool={prompt.aiTool} size={30} />
           )}
         </span>
 

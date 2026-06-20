@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
 import { useAuth } from '@/libs/auth-context.js';
+import NotificationBell from '@/components/notifications/NotificationBell.js';
 
 // Header navigation links
 const links = [
@@ -120,6 +121,7 @@ export default function Header() {
             {/* Show dashboard/logout if user is logged in */}
             {user ? (
               <>
+                <NotificationBell />
                 <Link
                   href="/dashboard"
                   className="btn-outline rounded-2xl px-4 py-3 text-sm font-black"
@@ -181,6 +183,7 @@ export default function Header() {
               <div className="my-1 border-t border-[#17192d]/15" />
               {user ? (
                 <>
+                  <div className="flex justify-end px-2"><NotificationBell /></div>
                   <Link
                     onClick={() => setOpen(false)}
                     href="/dashboard"

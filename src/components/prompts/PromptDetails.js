@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
 import { PrivateRoute } from '@/libs/auth-context.js';
 import { formatNumber, reportReasons } from '@/libs/utils.js';
+import { AiToolLogo } from './AiToolLogo.js';
 
 export default function PromptDetails() {
   return (
@@ -140,6 +141,7 @@ function Details() {
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
           {/* Main prompt details card */}
           <article className="hard-card rounded-[2rem] p-6">
+            <div className="mb-4 flex items-center gap-3"><AiToolLogo tool={prompt.aiTool} size={44} /><b>{prompt.aiTool}</b></div>
             {/* Prompt badges */}
             <div className="flex flex-wrap gap-2">
               <span className="mini-badge">

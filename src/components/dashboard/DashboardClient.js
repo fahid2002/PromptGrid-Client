@@ -13,6 +13,7 @@ import {
   AdminPrompts,
   AdminReports,
   AdminUsers,
+  AuditHistory,
   Payments,
 } from './AdminViews.js';
 import {
@@ -51,6 +52,7 @@ const routes = {
     ['All Prompts', 'admin/prompts'],
     ['All Payments', 'admin/payments'],
     ['Reported Prompts', 'admin/reports'],
+    ['Moderation History', 'admin/audit'],
     ['Analytics', 'admin/analytics'],
     ['Profile', 'profile'],
   ],
@@ -280,6 +282,10 @@ function View({ view, data, load, user, page, setPage }) {
         load={load}
       />
     );
+  }
+
+  if (view === 'admin/audit') {
+    return <AuditHistory data={data} page={page} setPage={setPage} />;
   }
 
   if (view === 'admin/analytics') {

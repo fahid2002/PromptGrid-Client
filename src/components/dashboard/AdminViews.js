@@ -109,7 +109,7 @@ export function AdminUsers({ users, currentUser, load }) {
 }
 
 export function AdminPrompts({ data, load, page, setPage }) {
-  // Handles approve, reject, feature and unfeature actions
+  // Handles approval and rejection. Featured status is ranked automatically.
   const moderate = async (id, action) => {
     const feedback =
       action === 'reject'
@@ -171,7 +171,7 @@ export function AdminPrompts({ data, load, page, setPage }) {
 
                 <p className="text-sm capitalize muted">
                   {item.creator?.name} · {item.visibility} · {item.status}
-                  {item.featured ? ' · Featured' : ''}
+                  {item.automaticallyFeatured ? ' · Featured' : ''}
                 </p>
               </div>
 
@@ -189,15 +189,6 @@ export function AdminPrompts({ data, load, page, setPage }) {
                   className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
                 >
                   Reject
-                </button>
-
-                <button
-                  onClick={() =>
-                    moderate(item._id, item.featured ? 'unfeature' : 'feature')
-                  }
-                  className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
-                >
-                  {item.featured ? 'Unfeature' : 'Feature'}
                 </button>
 
                 <button
@@ -321,6 +312,29 @@ export function AdminReports({ reports, load }) {
           <Empty text="No reports submitted." />
         ) : null}
       </div>
+    </div>
+  );
+}
+
+export function AuditHistory({ data, page, setPage }) {
+  return (
+    <div>
+      <h2 className="font-display text-3xl font-black">Moderation History</h2>
+      <p className="mt-2 text-sm muted">Permanent administrator record of reports, removals, warnings and moderation actions.</p>
+      <div className="mt-5 grid gap-3">
+        {data.entries.map((entry) => (
+          <div className="soft-card rounded-3xl p-4" key={entry._id}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <b className="capitalize">{entry.action.replaceAll('_', ' ')}</b>
+              <time className="text-xs muted">{new Date(entry.createdAt).toLocaleString()}</time>
+            </div>
+            <p className="mt-1 muted">{entry.summary}</p>
+            <p className="mt-2 text-xs muted">By {entry.actor?.name || 'System'} · {entry.targetType}</p>
+          </div>
+        ))}
+        {!data.entries.length ? <Empty text="No moderation history yet." /> : null}
+      </div>
+      <Pagination pagination={data.pagination} page={page} setPage={setPage} />
     </div>
   );
 }

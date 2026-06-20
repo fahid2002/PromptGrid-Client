@@ -43,6 +43,7 @@ export function dashboardEndpoint(view, page = 1) {
     'admin/users': '/dashboard/admin/users',
     'admin/payments': '/dashboard/admin/payments',
     'admin/reports': '/dashboard/admin/reports',
+    'admin/audit': '/dashboard/admin/audit',
     'admin/analytics': '/dashboard/admin/stats',
   };
 

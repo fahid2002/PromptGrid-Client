@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
+import { aiTools } from '@/data/ai-tools.js';
 import { formatNumber } from '@/libs/utils.js';
 import { Empty, Modal, Stats } from './primitives.js';
 
@@ -138,7 +139,7 @@ const emptyPrompt = {
   description: '',
   content: '',
   category: '',
-  aiTool: '',
+  aiTool: 'ChatGPT',
   tags: '',
   difficulty: 'Beginner',
   usageInstructions: '',
@@ -238,7 +239,6 @@ export function PromptForm({ prompt, onCancel, onSaved }) {
       {[
         ['title', 'Prompt Title'],
         ['category', 'Category'],
-        ['aiTool', 'AI Tool'],
         ['tags', 'Tags, comma separated'],
         ['thumbnailURL', 'Thumbnail Image URL'],
       ].map(([key, label]) => (
@@ -251,6 +251,21 @@ export function PromptForm({ prompt, onCancel, onSaved }) {
           placeholder={label}
         />
       ))}
+
+      {/* Controlled AI tool selection keeps logo mapping consistent. */}
+      <select
+        required
+        value={form.aiTool}
+        onChange={update('aiTool')}
+        className="rounded-2xl px-4 py-3"
+        aria-label="AI Tool"
+      >
+        {aiTools.map((tool) => (
+          <option key={tool.name} value={tool.name}>
+            {tool.name}
+          </option>
+        ))}
+      </select>
 
       {/* Prompt difficulty */}
       <select
