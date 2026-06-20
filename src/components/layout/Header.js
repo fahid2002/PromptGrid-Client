@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Moon, Sun } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -111,10 +111,10 @@ export default function Header() {
             {/* Theme toggle button */}
             <button
               onClick={toggleTheme}
-              className="btn-outline rounded-2xl px-4 py-3 text-sm font-black"
-              aria-label="Toggle theme"
+              className="btn-outline icon-button rounded-full p-3"
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {dark ? 'Light mode' : 'Dark mode'}
+              {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
             {/* Show dashboard/logout if user is logged in */}
@@ -178,6 +178,44 @@ export default function Header() {
                   {label}
                 </Link>
               ))}
+              <div className="my-1 border-t border-[#17192d]/15" />
+              {user ? (
+                <>
+                  <Link
+                    onClick={() => setOpen(false)}
+                    href="/dashboard"
+                    className="btn-outline rounded-2xl px-4 py-3 text-center text-sm font-black"
+                  >
+                    {user.name.split(' ')[0]} · {user.role}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      logout();
+                    }}
+                    className="btn-lime rounded-2xl px-5 py-3 text-sm font-black"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    onClick={() => setOpen(false)}
+                    href="/login"
+                    className="btn-outline rounded-2xl px-5 py-3 text-center text-sm font-black"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    onClick={() => setOpen(false)}
+                    href="/register"
+                    className="btn-lime rounded-2xl px-5 py-3 text-center text-sm font-black"
+                  >
+                    Start creating
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         ) : null}

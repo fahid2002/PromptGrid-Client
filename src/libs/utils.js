@@ -9,6 +9,8 @@ export const privatePrefixes = [
 export const formatNumber = (value) =>
   Number(value || 0).toLocaleString();
 
+export const isChartData = (value) => Array.isArray(value);
+
 // Normalizes API error message
 export const normalizeApiError = (value) =>
   value?.message || 'Something went wrong';

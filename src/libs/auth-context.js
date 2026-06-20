@@ -36,8 +36,9 @@ export function AuthProvider({ children }) {
 
   // Check user session when app first loads
   useEffect(() => {
-    void refresh();
-  }, [refresh]); // eslint-disable-line react-hooks/set-state-in-effect
+    const timer = window.setTimeout(() => void refresh(), 0);
+    return () => window.clearTimeout(timer);
+  }, [refresh]);
 
   // Memoized auth context value
   const value = useMemo(

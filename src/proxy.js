@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 
 // This proxy function checks protected routes before allowing access
 export function proxy(request) {
-  // Check if the authentication token exists in cookies
-  if (!request.cookies.get('promptgrid_token')) {
+  // Check for the short-lived access cookie issued by the server
+  if (!request.cookies.get('promptgrid_access')) {
     // Create login page URL
     const login = new URL('/login', request.url);
 

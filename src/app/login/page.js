@@ -1,9 +1,8 @@
 import { Suspense } from 'react';
 import AuthForm from '@/components/auth/AuthForm.js';
 
-export default function Page() {
+export default function LoginPage() {
   return (
-    // Suspense is used because AuthForm uses useSearchParams
     <Suspense>
       <AuthForm mode="login" />
     </Suspense>

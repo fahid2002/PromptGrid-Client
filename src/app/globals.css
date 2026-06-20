@@ -79,6 +79,43 @@ body.dark-mode {
   color: var(--muted);
 }
 
+/* Auth surfaces that intentionally remain light in both themes */
+.auth-light-surface {
+  color: #17192d;
+}
+
+/* Auth links must follow the active theme instead of a light-mode utility */
+.auth-link {
+  color: #17192d;
+}
+
+.dark-mode .auth-link {
+  color: #f8fafc;
+}
+
+.auth-role-option {
+  color: #17192d;
+}
+
+.auth-role-selected {
+  color: #0c1020;
+}
+
+.dark-mode .auth-role-option:not(.auth-role-selected) {
+  background: rgba(30, 41, 59, .92);
+  border-color: rgba(255, 255, 255, .18);
+  color: #f8fafc;
+}
+
+.dark-mode .auth-role-option:not(.auth-role-selected) .auth-role-description {
+  color: #a7b0c4;
+}
+
+.dark-mode .auth-preview {
+  background: rgba(30, 41, 59, .92);
+  border-color: rgba(255, 255, 255, .18);
+}
+
 /* Strong card style */
 .hard-card {
   background: #fff;

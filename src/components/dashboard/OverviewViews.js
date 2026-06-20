@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
 import { useAuth } from '@/libs/auth-context.js';
-import { initials } from '@/libs/utils.js';
+import { initials, isChartData } from '@/libs/utils.js';
 import { AnalyticsChart, Stats } from './primitives.js';
 
 export function DashboardHome({ data }) {
@@ -20,7 +20,7 @@ export function DashboardHome({ data }) {
       <Stats items={Object.entries(values)} />
 
       {/* Show analytics chart if prompt data exists */}
-      {data.prompts ? (
+      {isChartData(data.prompts) ? (
         <AnalyticsChart data={data.prompts} />
       ) : (
         <div className="soft-card mt-6 rounded-3xl p-5">

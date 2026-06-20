@@ -32,6 +32,7 @@ export default function AllPromptsClient() {
     difficulty: '',
     sort: 'popular',
     page: 1,
+    limit: 10,
   });
 
   // Stores prompt list and filter data from backend
