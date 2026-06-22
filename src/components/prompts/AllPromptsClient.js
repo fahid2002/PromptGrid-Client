@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/libs/auth-context.js';
 import { api } from '@/libs/api.js';
 import PromptCard from './PromptCard.js';
 
@@ -30,16 +31,33 @@ export default function AllPromptsClient() {
     category: params.get('category') || '',
     tool: '',
     difficulty: '',
+    visibility: params.get('visibility') || '',
     sort: 'popular',
     page: 1,
-    limit: 10,
+    limit: 9,
   });
 
   // Stores prompt list and filter data from backend
   const [data, setData] = useState(null);
 
+  const { user } = useAuth();
+
   // Stores API error message
   const [error, setError] = useState('');
+
+  const isPromptVisible = (prompt) => {
+    // Only show approved prompts in the marketplace
+    if (prompt.status !== 'approved') return false;
+    
+    // Show all public prompts
+    if (prompt.visibility !== 'private') return true;
+    
+    // Show private prompts only to premium subscribers or the creator
+    if (user?.subscription === 'premium') return true;
+    if (prompt.creator?._id === user?._id) return true;
+    
+    return false;
+  };
 
   useEffect(() => {
     // Convert filter object into URL query string
@@ -75,6 +93,15 @@ export default function AllPromptsClient() {
     }));
   };
 
+  const handleFilterChange = (key, value) => {
+    if (key === 'visibility' && value === 'premium-only') {
+      set('visibility', 'private');
+      return;
+    }
+
+    set(key, value);
+  };
+
   return (
     <section className="px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -86,7 +113,7 @@ export default function AllPromptsClient() {
           All Prompts Page
         </h1>
 
-        <div className="hard-card mt-8 rounded-[2rem] p-4 sm:p-6">
+        <div className="hard-card mt-8 rounded-4xl p-4 sm:p-6">
           {/* Search and filter controls */}
           <div className="grid gap-3 lg:grid-cols-[1.5fr_repeat(4,1fr)]">
             <input
@@ -118,6 +145,15 @@ export default function AllPromptsClient() {
             />
 
             <select
+              value={filters.visibility}
+              onChange={(event) => handleFilterChange('visibility', event.target.value)}
+              className="rounded-2xl px-4 py-3"
+            >
+              <option value="">All Prompts</option>
+              <option value="premium-only">Premium only</option>
+            </select>
+
+            <select
               value={filters.sort}
               onChange={(event) => set('sort', event.target.value)}
               className="rounded-2xl px-4 py-3"
@@ -145,23 +181,24 @@ export default function AllPromptsClient() {
 
           {/* Result count */}
           <p className="mt-5 text-sm font-black muted">
-            Showing {data?.prompts?.length || 0} of{' '}
-            {data?.pagination?.total || 0} approved public prompts
+            Showing {data?.prompts?.filter(isPromptVisible).length || 0} of {data?.pagination?.total || 0} visible prompts
           </p>
 
           {/* Prompt cards */}
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data?.prompts?.map((prompt) => (
-              <PromptCard
-                key={prompt._id}
-                prompt={prompt}
-              />
-            ))}
+            {data?.prompts
+              ?.filter(isPromptVisible)
+              .map((prompt) => (
+                <PromptCard
+                  key={prompt._id}
+                  prompt={prompt}
+                />
+              ))}
 
             {/* Empty state if no prompt matches the filters */}
-            {data && data.prompts.length === 0 ? (
+            {data && data.prompts.filter(isPromptVisible).length === 0 ? (
               <p className="soft-card rounded-3xl p-6 muted">
-                No public prompts match these filters.
+                No prompts match these filters.
               </p>
             ) : null}
 
@@ -170,14 +207,14 @@ export default function AllPromptsClient() {
               ? Array.from({ length: 6 }, (_, index) => (
                   <div
                     key={index}
-                    className="skeleton h-[310px] rounded-[1.8rem]"
+                    className="skeleton h-77.5 rounded-[1.8rem]"
                   />
                 ))
               : null}
           </div>
 
           {/* Pagination controls */}
-          <div className="mt-6 flex items-center justify-between rounded-3xl border border-dashed border-[var(--line)] p-4">
+          <div className="mt-6 flex items-center justify-between rounded-3xl border border-dashed border-(--line) p-4">
             <button
               disabled={filters.page <= 1}
               onClick={() => set('page', filters.page - 1)}

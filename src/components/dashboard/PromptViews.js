@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
 import { aiTools } from '@/data/ai-tools.js';
@@ -153,8 +153,29 @@ export function PromptForm({ prompt, onCancel, onSaved }) {
     prompt ? { ...prompt, tags: prompt.tags.join(', ') } : emptyPrompt
   );
 
+  // Available categories loaded from prompt data so users can type or select
+  const [categories, setCategories] = useState([]);
+
   // Tracks thumbnail upload state
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    api('/prompts/home')
+      .then((result) => {
+        if (active && result?.categories) {
+          setCategories(result.categories);
+        }
+      })
+      .catch(() => {
+        if (active) setCategories([]);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Updates form field value
   const update = (key) => (event) =>
@@ -236,21 +257,46 @@ export function PromptForm({ prompt, onCancel, onSaved }) {
       </div>
 
       {/* Basic prompt input fields */}
-      {[
-        ['title', 'Prompt Title'],
-        ['category', 'Category'],
-        ['tags', 'Tags, comma separated'],
-        ['thumbnailURL', 'Thumbnail Image URL'],
-      ].map(([key, label]) => (
+      <input
+        required
+        value={form.title}
+        onChange={update('title')}
+        className="input-box rounded-2xl px-4 py-3"
+        placeholder="Prompt Title"
+      />
+
+      <div className="relative">
         <input
           required
-          key={key}
-          value={form[key]}
-          onChange={update(key)}
+          list="prompt-categories"
+          value={form.category}
+          onChange={update('category')}
           className="input-box rounded-2xl px-4 py-3"
-          placeholder={label}
+          placeholder="Category (type or select)"
         />
-      ))}
+
+        <datalist id="prompt-categories">
+          {categories.map((category) => (
+            <option key={category} value={category} />
+          ))}
+        </datalist>
+      </div>
+
+      <input
+        required
+        value={form.tags}
+        onChange={update('tags')}
+        className="input-box rounded-2xl px-4 py-3"
+        placeholder="Tags, comma separated"
+      />
+
+      <input
+        required
+        value={form.thumbnailURL}
+        onChange={update('thumbnailURL')}
+        className="input-box rounded-2xl px-4 py-3"
+        placeholder="Thumbnail Image URL"
+      />
 
       {/* Controlled AI tool selection keeps logo mapping consistent. */}
       <select
@@ -278,14 +324,14 @@ export function PromptForm({ prompt, onCancel, onSaved }) {
         <option>Pro</option>
       </select>
 
-      {/* Prompt visibility */}
+      {/* Prompt type */}
       <select
         value={form.visibility}
         onChange={update('visibility')}
         className="rounded-2xl px-4 py-3"
       >
-        <option value="public">Public</option>
-        <option value="private">Private</option>
+        <option value="public">Regular Prompt</option>
+        <option value="private">Premium Prompt</option>
       </select>
 
       {/* Long text fields */}

@@ -46,7 +46,7 @@ export default function PromptCard({ prompt }) {
   return (
     <article className="hard-card group flex min-h-[310px] flex-col rounded-[1.8rem] p-6 transition hover:-translate-y-1">
       {/* Top icon and save button */}
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-6 flex items-start justify-between gap-3">
         <span className="grid h-12 w-12 place-items-center rounded-2xl border-2 border-[var(--line)] bg-[var(--lime)] text-slate-950">
           {prompt.visibility === 'private' ? (
             <LockKeyhole />
@@ -55,16 +55,22 @@ export default function PromptCard({ prompt }) {
           )}
         </span>
 
-        <button
-          onClick={bookmark}
-          className="badge"
-        >
-          <Bookmark
-            size={14}
-            fill={saved ? 'currentColor' : 'none'}
-          />{' '}
-          {saved ? 'Saved' : 'Save'}
-        </button>
+        <div className="flex items-center gap-2">
+          <span className="badge rounded-full bg-slate-950/90 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-white">
+            {prompt.visibility === 'private' ? 'Premium' : 'Free'}
+          </span>
+
+          <button
+            onClick={bookmark}
+            className="badge"
+          >
+            <Bookmark
+              size={14}
+              fill={saved ? 'currentColor' : 'none'}
+            />{' '}
+            {saved ? 'Saved' : 'Save'}
+          </button>
+        </div>
       </div>
 
       {/* Prompt title */}

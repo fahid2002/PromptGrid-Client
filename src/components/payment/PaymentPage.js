@@ -99,7 +99,7 @@ function Plan() {
           >
             {user?.subscription === 'premium'
               ? 'Premium already active'
-              : 'Continue to Stripe Checkout'}
+              : 'Continue to Checkout'}
           </button>
         </div>
       </div>

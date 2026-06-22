@@ -180,7 +180,11 @@ function Details() {
 
               {/* Premium locked overlay */}
               {prompt.locked ? (
-                <div className="absolute inset-0 grid place-items-center rounded-3xl bg-slate-950/80 p-6 text-center text-white">
+                <div
+                  role="button"
+                  onClick={() => router.push(`/payment?return=/prompts/${id}`)}
+                  className="absolute inset-0 grid place-items-center rounded-3xl bg-slate-950/80 p-6 text-center text-white cursor-pointer"
+                >
                   <div>
                     <h3 className="font-display text-2xl font-black">
                       Premium Prompt Locked
@@ -191,11 +195,8 @@ function Details() {
                       reviews.
                     </p>
 
-                    <button
-                      onClick={() => router.push(`/payment?return=/prompts/${id}`)}
-                      className="btn-lime mt-5 rounded-2xl px-5 py-3 font-black"
-                    >
-                      Subscribe to Premium
+                    <button className="btn-lime mt-5 rounded-2xl px-5 py-3 font-black">
+                      Get subscription to view prompt
                     </button>
                   </div>
                 </div>

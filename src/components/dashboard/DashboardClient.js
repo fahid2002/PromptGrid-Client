@@ -40,7 +40,6 @@ const routes = {
     ['Profile', 'profile'],
   ],
   creator: [
-    ['Creator Dashboard Home', ''],
     ['Add Prompt', 'add-prompt'],
     ['My Prompts', 'my-prompts'],
     ['Analytics', 'analytics'],
@@ -90,7 +89,8 @@ function Dashboard() {
         : dashboardEndpoint(view, page);
 
   // Check whether the current route is allowed for this user's role
-  const allowed = routes[user.role].some(([, path]) => path === view);
+  const allowed =
+    view === '' || routes[user.role].some(([, path]) => path === view);
 
   // Reload dashboard data after create, update, delete or moderation action
   const load = async () => {
@@ -137,7 +137,7 @@ function Dashboard() {
           {user.role} Dashboard
         </h1>
 
-        <div className="hard-card mt-8 overflow-hidden rounded-[2rem]">
+        <div className="hard-card mt-8 overflow-hidden rounded-4xl">
           <div className="grid lg:grid-cols-[280px_1fr]">
             {/* Dashboard sidebar */}
             <Sidebar
@@ -175,10 +175,10 @@ function Dashboard() {
 
 function Sidebar({ user, view }) {
   return (
-    <aside className="border-b border-[var(--line)] p-5 lg:border-b-0 lg:border-r">
+    <aside className="border-b border-(--line) p-5 lg:border-b-0 lg:border-r">
       {/* User profile card */}
       <div className="soft-card mb-5 flex items-center gap-3 rounded-3xl p-4">
-        <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-pink-500 font-black text-white">
+        <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-full bg-linear-to-br from-violet-500 to-pink-500 font-black text-white">
           {user.photoURL ? (
             <img
               alt=""
@@ -207,7 +207,7 @@ function Sidebar({ user, view }) {
             href={`/dashboard/${path}`}
             className={`rounded-2xl px-4 py-3 ${
               view === path
-                ? 'bg-[var(--lime)] text-slate-950'
+                ? 'bg-(--lime) text-slate-950'
                 : 'hover:bg-white/10'
             }`}
           >
@@ -221,7 +221,13 @@ function Sidebar({ user, view }) {
 
 function View({ view, data, load, user, page, setPage }) {
   // User and creator dashboard home
-  if (!view) return <DashboardHome data={data} />;
+  if (!view) {
+    return user.role === 'creator' ? (
+      <CreatorAnalytics data={data} />
+    ) : (
+      <DashboardHome data={data} />
+    );
+  }
 
   // Creator analytics page
   if (view === 'analytics') return <CreatorAnalytics data={data} />;

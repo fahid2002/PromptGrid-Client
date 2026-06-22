@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
 import { DataTable, Empty, Pagination } from './primitives.js';
+import { PromptForm } from './PromptViews.js';
 
 export function AdminUsers({ users, currentUser, load }) {
   // Updates a user's role from the admin dashboard
@@ -109,6 +111,9 @@ export function AdminUsers({ users, currentUser, load }) {
 }
 
 export function AdminPrompts({ data, load, page, setPage }) {
+  // State for prompt being edited
+  const [editing, setEditing] = useState(null);
+
   // Handles approval and rejection. Featured status is ranked automatically.
   const moderate = async (id, action) => {
     const feedback =
@@ -152,6 +157,20 @@ export function AdminPrompts({ data, load, page, setPage }) {
     }
   };
 
+  // Show edit form if a prompt is being edited
+  if (editing) {
+    return (
+      <PromptForm
+        prompt={editing}
+        onCancel={() => setEditing(null)}
+        onSaved={async () => {
+          setEditing(null);
+          await load();
+        }}
+      />
+    );
+  }
+
   return (
     <div>
       <h2 className="font-display text-3xl font-black">
@@ -177,6 +196,13 @@ export function AdminPrompts({ data, load, page, setPage }) {
 
               {/* Admin prompt action buttons */}
               <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setEditing(item)}
+                  className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
+                >
+                  Edit
+                </button>
+
                 <button
                   onClick={() => moderate(item._id, 'approve')}
                   className="btn-lime rounded-xl px-3 py-2 text-sm font-black"

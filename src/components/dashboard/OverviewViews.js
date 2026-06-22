@@ -29,7 +29,7 @@ export function DashboardHome({ data }) {
           </h2>
 
           <p className="mt-2 muted">
-            All values shown above come from current MongoDB records.
+            All values shown above come from your own activities.
           </p>
         </div>
       )}
