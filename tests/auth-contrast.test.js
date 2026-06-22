@@ -22,4 +22,11 @@ describe('authentication dark-mode contrast', () => {
   it('requests ten approved prompts for the initial marketplace page', () => {
     expect(read('src/components/prompts/AllPromptsClient.js')).toContain("limit: 10");
   });
+
+  it('keeps account details out of the Google button until it is clicked', () => {
+    const googleButton = read('src/components/auth/GoogleAuthButton.js');
+    expect(googleButton).toContain('useGoogleLogin');
+    expect(googleButton).toContain('Continue with Google');
+    expect(googleButton).not.toContain('<GoogleLogin');
+  });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
 
 function GoogleMark() {
@@ -16,24 +16,39 @@ function GoogleMark() {
 
 export function GoogleAuthButton({ configured, onSuccess, errorMessage }) {
   if (configured) {
-    return (
-      <div className="google-auth-control flex w-full justify-center overflow-hidden rounded-2xl">
-        <GoogleLogin
-          text="continue_with"
-          shape="rectangular"
-          size="large"
-          width="400"
-          onSuccess={({ credential }) => onSuccess(credential)}
-          onError={() => toast.error(errorMessage)}
-        />
-      </div>
-    );
+    return <ConfiguredGoogleAuthButton onSuccess={onSuccess} errorMessage={errorMessage} />;
   }
 
   return (
     <button
       type="button"
       onClick={() => toast.info('Add your Google Web Client ID to both environment files, then restart the client and server.')}
+      className="auth-light-surface flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-[#17192d] bg-white px-5 py-3 text-sm font-black transition hover:bg-[#f4f6ff]"
+    >
+      <GoogleMark />
+      Continue with Google
+    </button>
+  );
+}
+
+function ConfiguredGoogleAuthButton({ onSuccess, errorMessage }) {
+  const openGoogle = useGoogleLogin({
+    flow: 'implicit',
+    scope: 'openid email profile',
+    onSuccess: ({ access_token: accessToken }) => {
+      if (!accessToken) {
+        toast.error('Google did not return a valid access token.');
+        return;
+      }
+      onSuccess(accessToken);
+    },
+    onError: () => toast.error(errorMessage),
+  });
+
+  return (
+    <button
+      type="button"
+      onClick={() => openGoogle()}
       className="auth-light-surface flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-[#17192d] bg-white px-5 py-3 text-sm font-black transition hover:bg-[#f4f6ff]"
     >
       <GoogleMark />

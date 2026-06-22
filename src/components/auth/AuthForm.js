@@ -80,17 +80,23 @@ export default function AuthForm({ mode }) {
     }
   };
 
-  const google = async (credential) => {
-    if (!credential) {
-      toast.error('Google did not return a valid credential.');
+  const google = async (accessToken) => {
+    if (!accessToken) {
+      toast.error('Google did not return a valid access token.');
       return;
     }
     try {
       const intent = register ? 'register' : 'login';
-      const data = await api('/auth/google', { method: 'POST', body: JSON.stringify(buildGoogleAuthPayload(credential, intent, form.role)) });
-      setUser(data.user);
-      toast.success(register ? `Google ${data.user.role} account created.` : `Welcome back, ${data.user.name}.`);
-      router.push('/dashboard');
+      const data = await api('/auth/google', { method: 'POST', body: JSON.stringify(buildGoogleAuthPayload(accessToken, intent, form.role)) });
+      if (register) {
+        setUser(null);
+        toast.success(`Google ${data.user.role} account created. Please log in.`);
+      } else {
+        setUser(data.user);
+        toast.success(`Welcome back, ${data.user.name}.`);
+      }
+      router.replace(authDestination(intent));
+      router.refresh();
     } catch (error) {
       toast.error(error.message);
     }

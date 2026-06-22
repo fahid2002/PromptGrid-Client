@@ -12,8 +12,8 @@ export function buildRegistrationData(form) {
   return data;
 }
 
-export function buildGoogleAuthPayload(credential, intent, role = 'user') {
-  return { credential, intent, role };
+export function buildGoogleAuthPayload(accessToken, intent, role = 'user') {
+  return { accessToken, intent, role };
 }
 
 export function isGoogleConfigured(clientId) {

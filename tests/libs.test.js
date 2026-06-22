@@ -78,8 +78,8 @@ describe('client contracts', () => {
   });
 
   it('builds intent-aware Google payloads', () => {
-    expect(buildGoogleAuthPayload('token', 'register', 'creator')).toEqual({ credential: 'token', intent: 'register', role: 'creator' });
-    expect(buildGoogleAuthPayload('token', 'login')).toEqual({ credential: 'token', intent: 'login', role: 'user' });
+    expect(buildGoogleAuthPayload('token', 'register', 'creator')).toEqual({ accessToken: 'token', intent: 'register', role: 'creator' });
+    expect(buildGoogleAuthPayload('token', 'login')).toEqual({ accessToken: 'token', intent: 'login', role: 'user' });
   });
 
   it('does not treat the environment template as Google configuration', () => {
