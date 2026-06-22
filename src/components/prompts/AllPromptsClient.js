@@ -2,7 +2,6 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/libs/auth-context.js';
 import { api } from '@/libs/api.js';
 import PromptCard from './PromptCard.js';
 
@@ -40,24 +39,8 @@ export default function AllPromptsClient() {
   // Stores prompt list and filter data from backend
   const [data, setData] = useState(null);
 
-  const { user } = useAuth();
-
   // Stores API error message
   const [error, setError] = useState('');
-
-  const isPromptVisible = (prompt) => {
-    // Only show approved prompts in the marketplace
-    if (prompt.status !== 'approved') return false;
-    
-    // Show all public prompts
-    if (prompt.visibility !== 'private') return true;
-    
-    // Show private prompts only to premium subscribers or the creator
-    if (user?.subscription === 'premium') return true;
-    if (prompt.creator?._id === user?._id) return true;
-    
-    return false;
-  };
 
   useEffect(() => {
     // Convert filter object into URL query string
@@ -91,15 +74,6 @@ export default function AllPromptsClient() {
       [key]: value,
       page: key === 'page' ? value : 1,
     }));
-  };
-
-  const handleFilterChange = (key, value) => {
-    if (key === 'visibility' && value === 'premium-only') {
-      set('visibility', 'private');
-      return;
-    }
-
-    set(key, value);
   };
 
   return (
@@ -146,11 +120,12 @@ export default function AllPromptsClient() {
 
             <select
               value={filters.visibility}
-              onChange={(event) => handleFilterChange('visibility', event.target.value)}
+              onChange={(event) => set('visibility', event.target.value)}
               className="rounded-2xl px-4 py-3"
             >
               <option value="">All Prompts</option>
-              <option value="premium-only">Premium only</option>
+              <option value="public">Free/Public only</option>
+              <option value="private">Premium only</option>
             </select>
 
             <select
@@ -181,14 +156,13 @@ export default function AllPromptsClient() {
 
           {/* Result count */}
           <p className="mt-5 text-sm font-black muted">
-            Showing {data?.prompts?.filter(isPromptVisible).length || 0} of {data?.pagination?.total || 0} visible prompts
+            Showing {data?.prompts?.length || 0} of {data?.pagination?.total || 0} prompts
           </p>
 
           {/* Prompt cards */}
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {data?.prompts
-              ?.filter(isPromptVisible)
-              .map((prompt) => (
+              ?.map((prompt) => (
                 <PromptCard
                   key={prompt._id}
                   prompt={prompt}
@@ -196,7 +170,7 @@ export default function AllPromptsClient() {
               ))}
 
             {/* Empty state if no prompt matches the filters */}
-            {data && data.prompts.filter(isPromptVisible).length === 0 ? (
+            {data && data.prompts.length === 0 ? (
               <p className="soft-card rounded-3xl p-6 muted">
                 No prompts match these filters.
               </p>
