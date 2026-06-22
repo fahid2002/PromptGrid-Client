@@ -3,10 +3,11 @@
 import { Pencil } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
+import { authDestination } from '@/libs/auth-navigation.js';
 import { buildGoogleAuthPayload, buildRegistrationData, initialRegistrationForm, isGoogleConfigured, validateProfileImage } from '@/libs/registration.js';
 import { useAuth } from '@/libs/auth-context.js';
 import { ProfilePhotoEditor } from './ProfilePhotoEditor.js';
@@ -24,7 +25,6 @@ export default function AuthForm({ mode }) {
   const previewURLRef = useRef('');
   const { setUser } = useAuth();
   const router = useRouter();
-  const params = useSearchParams();
   const googleConfigured = isGoogleConfigured(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
   useEffect(() => () => {
@@ -64,12 +64,14 @@ export default function AuthForm({ mode }) {
       if (register) {
         await api('/auth/register', { method: 'POST', body: buildRegistrationData(form) });
         toast.success(`${form.role === 'creator' ? 'Creator' : 'User'} account created. Please log in.`);
-        router.push('/login');
+        router.replace(authDestination('register'));
+        router.refresh();
       } else {
         const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email: form.email, password: form.password, role: form.role }) });
         setUser(data.user);
         toast.success(`Welcome back, ${data.user.name}.`);
-        router.push(params.get('next') || '/dashboard');
+        router.replace(authDestination('login'));
+        router.refresh();
       }
     } catch (error) {
       toast.error(error.message);

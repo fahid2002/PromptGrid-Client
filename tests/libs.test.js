@@ -14,8 +14,14 @@ import {
 import * as utils from '../src/libs/utils.js';
 import { buildGoogleAuthPayload, buildRegistrationData, initialRegistrationForm, isGoogleConfigured, validateProfileImage } from '../src/libs/registration.js';
 import * as registration from '../src/libs/registration.js';
+import { authDestination } from '../src/libs/auth-navigation.js';
 
 describe('client contracts', () => {
+  it('uses the required post-authentication destinations', () => {
+    expect(authDestination('register')).toBe('/login');
+    expect(authDestination('login')).toBe('/');
+  });
+
   it('renders analytics charts only for array data', () => {
     expect(utils.isChartData?.([{ title: 'Prompt', copies: 1 }])).toBe(true);
     expect(utils.isChartData?.(10)).toBe(false);

@@ -1,27 +1,30 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { api } from '@/libs/api.js';
-import { PrivateRoute, useAuth } from '@/libs/auth-context.js';
+import { useAuth } from '@/libs/auth-context.js';
 
 export default function PaymentPage() {
-  return (
-    <PrivateRoute>
-      <Plan />
-    </PrivateRoute>
-  );
+  return <Plan />;
 }
 
 function Plan() {
   // Used to read return path from URL query
   const params = useSearchParams();
+  const router = useRouter();
 
   // Get logged-in user information
   const { user } = useAuth();
 
   // Starts Stripe checkout process
   const checkout = async () => {
+    if (!user) {
+      toast.info('Log in to continue to checkout.');
+      router.push('/login?next=%2Fpayment');
+      return;
+    }
+
     try {
       const { url } = await api('/payments/checkout', {
         method: 'POST',
@@ -51,7 +54,7 @@ function Plan() {
 
           <p className="mt-5 leading-7 muted">
             Stripe-hosted Checkout verifies payment before Premium access is
-            enabled for {user.email}.
+            enabled for {user ? user.email : 'your account'}.
           </p>
         </div>
 
@@ -90,11 +93,11 @@ function Plan() {
 
           {/* Checkout button disabled if user already has premium */}
           <button
-            disabled={user.subscription === 'premium'}
+            disabled={user?.subscription === 'premium'}
             onClick={checkout}
             className="btn-lime mt-7 w-full rounded-2xl px-6 py-4 font-black disabled:opacity-50"
           >
-            {user.subscription === 'premium'
+            {user?.subscription === 'premium'
               ? 'Premium already active'
               : 'Continue to Stripe Checkout'}
           </button>

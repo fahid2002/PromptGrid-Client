@@ -7,10 +7,16 @@ describe('public authentication routes', () => {
     expect(existsSync(resolve('src', 'app', route, 'page.js'))).toBe(true);
   });
 
-  it('protects private routes with the current access-cookie name', () => {
-    const proxySource = readFileSync(resolve('src', 'proxy.js'), 'utf8');
-    expect(proxySource).toContain("request.cookies.get('promptgrid_access')");
-    expect(proxySource).not.toContain("request.cookies.get('promptgrid_token')");
+  it('uses session-aware client protection without cookie-only page middleware', () => {
+    expect(existsSync(resolve('src', 'proxy.js'))).toBe(false);
+    const dashboardSource = readFileSync(resolve('src', 'components', 'dashboard', 'DashboardClient.js'), 'utf8');
+    expect(dashboardSource).toContain('<PrivateRoute>');
+  });
+
+  it('keeps Pricing public and gates only checkout', () => {
+    const paymentSource = readFileSync(resolve('src', 'components', 'payment', 'PaymentPage.js'), 'utf8');
+    expect(paymentSource).not.toContain('<PrivateRoute>');
+    expect(paymentSource).toContain("router.push('/login?next=%2Fpayment')");
   });
 
   it('keeps login and registration actions available in desktop and mobile navigation', () => {
