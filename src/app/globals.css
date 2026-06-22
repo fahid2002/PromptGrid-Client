@@ -225,6 +225,79 @@ body.dark-mode {
   border: 1px solid rgba(124, 58, 237, .2);
 }
 
+/* Visibility badge: Free / Premium */
+.visibility-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border-radius: 999px;
+  padding: .42rem .75rem;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  border: 1.5px solid transparent;
+}
+
+/* Free = light green */
+.visibility-badge-free {
+  background: rgba(34, 197, 94, .16);
+  color: #166534;
+  border-color: rgba(34, 197, 94, .35);
+}
+
+/* Premium = light red */
+.visibility-badge-premium {
+  background: rgba(248, 113, 113, .18);
+  color: #991b1b;
+  border-color: rgba(248, 113, 113, .42);
+}
+
+/* Dark mode visibility */
+.dark-mode .visibility-badge-free {
+  background: rgba(34, 197, 94, .18);
+  color: #bbf7d0;
+  border-color: rgba(34, 197, 94, .38);
+}
+
+.dark-mode .visibility-badge-premium {
+  background: rgba(248, 113, 113, .18);
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, .42);
+}
+
+/* Small premium/free chip inside tag area */
+.visibility-chip {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: .24rem .55rem;
+  font-size: .68rem;
+  font-weight: 900;
+  border: 1px solid transparent;
+}
+
+.visibility-chip-free {
+  background: rgba(34, 197, 94, .14);
+  color: #166534;
+  border-color: rgba(34, 197, 94, .28);
+}
+
+.visibility-chip-premium {
+  background: rgba(248, 113, 113, .16);
+  color: #991b1b;
+  border-color: rgba(248, 113, 113, .35);
+}
+
+.dark-mode .visibility-chip-free {
+  background: rgba(34, 197, 94, .16);
+  color: #bbf7d0;
+}
+
+.dark-mode .visibility-chip-premium {
+  background: rgba(248, 113, 113, .16);
+  color: #fecaca;
+}
+
 /* Small uppercase section label */
 .section-label {
   color: #4f46e5;

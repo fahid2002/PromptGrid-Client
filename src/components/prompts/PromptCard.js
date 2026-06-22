@@ -22,6 +22,7 @@ export default function PromptCard({ prompt }) {
 
   // Tracks bookmark button state on this card
   const [saved, setSaved] = useState(false);
+  const isPremium = prompt.visibility === 'private';
 
   // Handles save/bookmark action
   const bookmark = async () => {
@@ -56,9 +57,13 @@ export default function PromptCard({ prompt }) {
         </span>
 
         <div className="flex items-center gap-2">
-          <span className="badge rounded-full bg-slate-950/90 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-white">
-            {prompt.visibility === 'private' ? 'Premium' : 'Free'}
-          </span>
+          <span
+  className={`visibility-badge ${
+    isPremium ? 'visibility-badge-premium' : 'visibility-badge-free'
+  }`}
+>
+  {isPremium ? 'Premium' : 'Free'}
+</span>
 
           <button
             onClick={bookmark}
@@ -97,11 +102,13 @@ export default function PromptCard({ prompt }) {
           {prompt.difficulty}
         </span>
 
-        {prompt.visibility === 'private' ? (
-          <span className="mini-badge">
-            Premium
-          </span>
-        ) : null}
+        <span
+  className={`visibility-chip ${
+    isPremium ? 'visibility-chip-premium' : 'visibility-chip-free'
+  }`}
+>
+  {isPremium ? 'Premium' : 'Free'}
+</span>
       </div>
 
       {/* Creator, rating and copy count */}

@@ -144,11 +144,17 @@ function Details() {
             <div className="mb-4 flex items-center gap-3"><AiToolLogo tool={prompt.aiTool} size={44} /><b>{prompt.aiTool}</b></div>
             {/* Prompt badges */}
             <div className="flex flex-wrap gap-2">
-              <span className="mini-badge">
-                {prompt.visibility === 'private'
-                  ? 'Private / Premium'
-                  : 'Public Prompt'}
-              </span>
+              <span
+  className={`visibility-chip ${
+    prompt.visibility === 'private'
+      ? 'visibility-chip-premium'
+      : 'visibility-chip-free'
+  }`}
+>
+  {prompt.visibility === 'private'
+    ? 'Private / Premium'
+    : 'Public / Free'}
+</span>
 
               <span className="mini-badge">
                 {prompt.aiTool}
