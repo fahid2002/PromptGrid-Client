@@ -40,10 +40,12 @@ export function dashboardEndpoint(view, page = 1) {
     'saved-prompts': '/dashboard/bookmarks',
     'my-reviews': '/dashboard/reviews',
     analytics: '/dashboard/analytics',
+    notifications: `/dashboard/notifications?page=${page}&limit=6`,
+    activity: `/dashboard/activity?page=${page}&limit=6`,
     'admin/users': '/dashboard/admin/users',
     'admin/payments': '/dashboard/admin/payments',
     'admin/reports': '/dashboard/admin/reports',
-    'admin/audit': '/dashboard/admin/audit',
+    'admin/audit': `/dashboard/admin/audit?page=${page}&limit=6`,
     'admin/analytics': '/dashboard/admin/stats',
   };
 

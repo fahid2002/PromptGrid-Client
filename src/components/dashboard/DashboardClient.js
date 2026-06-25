@@ -28,6 +28,10 @@ import {
   SavedPrompts,
 } from './PromptViews.js';
 import { Stats } from './primitives.js';
+import {
+  ActivityLog,
+  NotificationHistory,
+} from './HistoryViews.js';
 
 // Dashboard sidebar routes based on user role
 const routes = {
@@ -37,14 +41,21 @@ const routes = {
     ['My Prompts', 'my-prompts'],
     ['Saved Prompts', 'saved-prompts'],
     ['My Reviews', 'my-reviews'],
+    ['Notifications', 'notifications'],
+    ['Activity Log', 'activity'],
     ['Profile', 'profile'],
   ],
+
   creator: [
+    ['Creator Dashboard Home', ''],
     ['Add Prompt', 'add-prompt'],
     ['My Prompts', 'my-prompts'],
     ['Analytics', 'analytics'],
+    ['Notifications', 'notifications'],
+    ['Activity Log', 'activity'],
     ['Profile', 'profile'],
   ],
+
   admin: [
     ['Admin Dashboard Home', ''],
     ['All Users', 'admin/users'],
@@ -52,6 +63,8 @@ const routes = {
     ['All Payments', 'admin/payments'],
     ['Reported Prompts', 'admin/reports'],
     ['Moderation History', 'admin/audit'],
+    ['Notifications', 'notifications'],
+    ['Activity Log', 'activity'],
     ['Analytics', 'admin/analytics'],
     ['Profile', 'profile'],
   ],
@@ -74,11 +87,19 @@ function Dashboard() {
 
   const view = (params.view || []).join('/');
 
+  // Sidebar routes for current role
+  const roleRoutes = routes[user.role] || routes.user;
+
   // Page state used for paginated dashboard views
   const [page, setPage] = useState(1);
 
   // Stores dashboard API response
   const [data, setData] = useState(null);
+
+  // Reset pagination when dashboard view changes
+  useEffect(() => {
+    setPage(1);
+  }, [view]);
 
   // Decide which API endpoint should be called based on current view and role
   const endpoint =
@@ -90,11 +111,13 @@ function Dashboard() {
 
   // Check whether the current route is allowed for this user's role
   const allowed =
-    view === '' || routes[user.role].some(([, path]) => path === view);
+    view === '' || roleRoutes.some(([, path]) => path === view);
 
   // Reload dashboard data after create, update, delete or moderation action
   const load = async () => {
-    if (!allowed || view === 'add-prompt' || view === 'profile') return;
+    if (!allowed || view === 'add-prompt' || view === 'profile' || !endpoint) {
+      return;
+    }
 
     try {
       setData(await api(endpoint));
@@ -105,7 +128,9 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    if (!allowed || view === 'add-prompt' || view === 'profile') return;
+    if (!allowed || view === 'add-prompt' || view === 'profile' || !endpoint) {
+      return;
+    }
 
     // Prevents state update if component unmounts before API finishes
     let active = true;
@@ -143,6 +168,7 @@ function Dashboard() {
             <Sidebar
               user={user}
               view={view}
+              roleRoutes={roleRoutes}
             />
 
             {/* Main dashboard content */}
@@ -173,7 +199,7 @@ function Dashboard() {
   );
 }
 
-function Sidebar({ user, view }) {
+function Sidebar({ user, view, roleRoutes }) {
   return (
     <aside className="border-b border-(--line) p-5 lg:border-b-0 lg:border-r">
       {/* User profile card */}
@@ -201,10 +227,10 @@ function Sidebar({ user, view }) {
 
       {/* Sidebar navigation links */}
       <nav className="grid gap-2 text-sm font-extrabold">
-        {routes[user.role].map(([label, path]) => (
+        {roleRoutes.map(([label, path]) => (
           <Link
             key={label}
-            href={`/dashboard/${path}`}
+            href={path ? `/dashboard/${path}` : '/dashboard'}
             className={`rounded-2xl px-4 py-3 ${
               view === path
                 ? 'bg-(--lime) text-slate-950'
@@ -220,7 +246,7 @@ function Sidebar({ user, view }) {
 }
 
 function View({ view, data, load, user, page, setPage }) {
-  // User and creator dashboard home
+  // User, creator and admin dashboard home
   if (!view) {
     return user.role === 'creator' ? (
       <CreatorAnalytics data={data} />
@@ -230,7 +256,31 @@ function View({ view, data, load, user, page, setPage }) {
   }
 
   // Creator analytics page
-  if (view === 'analytics') return <CreatorAnalytics data={data} />;
+  if (view === 'analytics') {
+    return <CreatorAnalytics data={data} />;
+  }
+
+  // Notification history page for all roles
+  if (view === 'notifications') {
+    return (
+      <NotificationHistory
+        data={data}
+        page={page}
+        setPage={setPage}
+      />
+    );
+  }
+
+  // Activity log page for all roles
+  if (view === 'activity') {
+    return (
+      <ActivityLog
+        data={data}
+        page={page}
+        setPage={setPage}
+      />
+    );
+  }
 
   // User or creator prompt pages
   if (view === 'my-prompts') {
@@ -291,7 +341,13 @@ function View({ view, data, load, user, page, setPage }) {
   }
 
   if (view === 'admin/audit') {
-    return <AuditHistory data={data} page={page} setPage={setPage} />;
+    return (
+      <AuditHistory
+        data={data}
+        page={page}
+        setPage={setPage}
+      />
+    );
   }
 
   if (view === 'admin/analytics') {
