@@ -114,14 +114,14 @@ export function AdminPrompts({ data, load, page, setPage }) {
   // State for prompt being edited
   const [editing, setEditing] = useState(null);
 
-  // Handles approval and rejection. Featured status is ranked automatically.
+  // Handles approve, reject, feature and unfeature actions
   const moderate = async (id, action) => {
     const feedback =
       action === 'reject'
         ? prompt('Rejection feedback for the creator:')
         : undefined;
 
-    if (action === 'reject' && !feedback) return;
+    if (action === 'reject' && !feedback?.trim()) return;
 
     try {
       await api(`/dashboard/admin/prompts/${id}/moderate`, {
@@ -132,8 +132,16 @@ export function AdminPrompts({ data, load, page, setPage }) {
         }),
       });
 
-      toast.success('Prompt updated');
+      const successMessage =
+        action === 'approve'
+          ? 'Prompt approved'
+          : action === 'reject'
+            ? 'Prompt rejected'
+            : action === 'feature'
+              ? 'Prompt featured'
+              : 'Prompt unfeatured';
 
+      toast.success(successMessage);
       await load();
     } catch (error) {
       toast.error(error.message);
@@ -150,7 +158,6 @@ export function AdminPrompts({ data, load, page, setPage }) {
       });
 
       toast.success('Prompt deleted');
-
       await load();
     } catch (error) {
       toast.error(error.message);
@@ -179,54 +186,114 @@ export function AdminPrompts({ data, load, page, setPage }) {
 
       {/* Prompt moderation list */}
       <div className="mt-5 grid gap-3">
-        {data.prompts.map((item) => (
-          <div
-            className="soft-card rounded-3xl p-4"
-            key={item._id}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <b>{item.title}</b>
+        {data.prompts.map((item) => {
+          const isApproved = item.status === 'approved';
+          const isRejected = item.status === 'rejected';
+          const isPending = item.status === 'pending';
+          const isFeatured = Boolean(item.featured);
 
-                <p className="text-sm capitalize muted">
-                  {item.creator?.name} · {item.visibility} · {item.status}
-                  {item.automaticallyFeatured ? ' · Featured' : ''}
-                </p>
-              </div>
+          return (
+            <div
+              className="soft-card rounded-3xl p-4"
+              key={item._id}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <b>{item.title}</b>
 
-              {/* Admin prompt action buttons */}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setEditing(item)}
-                  className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
-                >
-                  Edit
-                </button>
+                  <p className="mt-1 text-sm capitalize muted">
+                    {item.creator?.name || 'Unknown Creator'} · {item.visibility} ·{' '}
+                    {item.status}
+                    {isFeatured ? ' · Featured' : ''}
+                    {!isFeatured && item.automaticallyFeatured
+                      ? ' · Trending'
+                      : ''}
+                  </p>
 
-                <button
-                  onClick={() => moderate(item._id, 'approve')}
-                  className="btn-lime rounded-xl px-3 py-2 text-sm font-black"
-                >
-                  Approve
-                </button>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${
+                        isApproved
+                          ? 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200'
+                          : isRejected
+                            ? 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200'
+                            : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-200'
+                      }`}
+                    >
+                      {isApproved ? 'Approved' : isRejected ? 'Rejected' : 'Pending'}
+                    </span>
 
-                <button
-                  onClick={() => moderate(item._id, 'reject')}
-                  className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
-                >
-                  Reject
-                </button>
+                    {isFeatured ? (
+                      <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-purple-700 dark:bg-purple-500/15 dark:text-purple-200">
+                        Featured
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
 
-                <button
-                  onClick={() => remove(item._id)}
-                  className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
-                >
-                  Delete
-                </button>
+                {/* Admin prompt action buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setEditing(item)}
+                    className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    disabled={isApproved}
+                    onClick={() => moderate(item._id, 'approve')}
+                    className={`rounded-xl px-3 py-2 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                      isApproved
+                        ? 'border border-green-400/40 bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200'
+                        : 'btn-lime'
+                    }`}
+                  >
+                    {isApproved ? 'Approved' : 'Approve'}
+                  </button>
+
+                  <button
+                    disabled={isRejected}
+                    onClick={() => moderate(item._id, 'reject')}
+                    className={`rounded-xl px-3 py-2 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                      isRejected
+                        ? 'border border-red-400/40 bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200'
+                        : 'btn-outline'
+                    }`}
+                  >
+                    {isRejected ? 'Rejected' : 'Reject'}
+                  </button>
+
+                  <button
+                    disabled={!isApproved}
+                    onClick={() =>
+                      moderate(item._id, isFeatured ? 'unfeature' : 'feature')
+                    }
+                    className={`rounded-xl px-3 py-2 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                      isFeatured
+                        ? 'border border-purple-400/40 bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-200'
+                        : 'btn-outline'
+                    }`}
+                    title={
+                      isApproved
+                        ? ''
+                        : 'Only approved prompts can be featured'
+                    }
+                  >
+                    {isFeatured ? 'Unfeature' : 'Feature'}
+                  </button>
+
+                  <button
+                    onClick={() => remove(item._id)}
+                    className="btn-outline rounded-xl px-3 py-2 text-sm font-black"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Empty state if no prompts are found */}
         {data.prompts.length === 0 ? (
@@ -269,6 +336,15 @@ export function Payments({ payments }) {
 export function AdminReports({ reports, load }) {
   // Saves the admin action for a reported prompt
   const act = async (id, status) => {
+    const confirmMessage =
+      status === 'removed'
+        ? 'Remove this prompt from the marketplace? The report will stay in the list as removed.'
+        : status === 'warned'
+          ? 'Warn the creator about this reported prompt?'
+          : 'Dismiss this report as not harmful?';
+
+    if (!confirm(confirmMessage)) return;
+
     try {
       await api(`/dashboard/admin/reports/${id}`, {
         method: 'PATCH',
@@ -277,12 +353,81 @@ export function AdminReports({ reports, load }) {
         }),
       });
 
-      toast.success('Report action saved');
+      const message =
+        status === 'removed'
+          ? 'Prompt removed'
+          : status === 'warned'
+            ? 'Creator warned'
+            : 'Report dismissed';
 
+      toast.success(message);
       await load();
     } catch (error) {
       toast.error(error.message);
     }
+  };
+
+  // Removes only the report card from the admin report page
+  const removeReport = async (id) => {
+    if (!confirm('Remove this report from the reported prompts page?')) return;
+
+    try {
+      await api(`/dashboard/admin/reports/${id}`, {
+        method: 'DELETE',
+      });
+
+      toast.success('Report removed from list');
+      await load();
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const getPromptInfo = (report) => {
+    const snapshot = report.promptSnapshot || {};
+
+    return {
+      title:
+        snapshot.title ||
+        report.prompt?.title ||
+        'Unknown Prompt',
+      description:
+        snapshot.description ||
+        report.prompt?.description ||
+        'No prompt description available.',
+      category:
+        snapshot.category ||
+        report.prompt?.category ||
+        'Unknown category',
+      aiTool:
+        snapshot.aiTool ||
+        report.prompt?.aiTool ||
+        'Unknown tool',
+      difficulty:
+        snapshot.difficulty ||
+        report.prompt?.difficulty ||
+        'Unknown difficulty',
+      visibility:
+        snapshot.visibility ||
+        report.prompt?.visibility ||
+        'Unknown visibility',
+    };
+  };
+
+  const statusClass = (status) => {
+    if (status === 'removed') {
+      return 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200';
+    }
+
+    if (status === 'warned') {
+      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-200';
+    }
+
+    if (status === 'dismissed') {
+      return 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200';
+    }
+
+    return 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-white';
   };
 
   return (
@@ -293,45 +438,125 @@ export function AdminReports({ reports, load }) {
 
       {/* Reported prompts list */}
       <div className="mt-5 grid gap-4">
-        {reports.map((report) => (
-          <div
-            className="soft-card rounded-3xl p-5"
-            key={report._id}
-          >
-            <b>
-              {report.prompt?.title || 'Removed Prompt'}
-            </b>
+        {reports.map((report) => {
+          const promptInfo = getPromptInfo(report);
+          const isRemoved = report.status === 'removed';
+          const isWarned = report.status === 'warned';
+          const isDismissed = report.status === 'dismissed';
+          const isResolved = isRemoved || isWarned || isDismissed;
 
-            <p className="mt-2 muted">
-              {report.reason} · {report.description || 'No description'} ·{' '}
-              {report.status}
-            </p>
-
-            {/* Report action buttons */}
-            <div className="mt-4 flex flex-wrap gap-2">
+          return (
+            <div
+              className="soft-card relative rounded-3xl p-5"
+              key={report._id}
+            >
+              {/* Cross button: removes only the report from this page */}
               <button
-                onClick={() => act(report._id, 'removed')}
-                className="btn-outline rounded-xl px-3 py-2 font-black"
+                type="button"
+                onClick={() => removeReport(report._id)}
+                className="absolute right-4 top-4 rounded-full border border-[var(--line)] px-3 py-1 text-sm font-black transition hover:bg-red-500 hover:text-white"
+                title="Remove report from list"
               >
-                Remove Prompt
+                ×
               </button>
 
-              <button
-                onClick={() => act(report._id, 'warned')}
-                className="btn-outline rounded-xl px-3 py-2 font-black"
-              >
-                Warn Creator
-              </button>
+              <div className="pr-10">
+                <div className="flex flex-wrap items-center gap-2">
+                  <b>{promptInfo.title}</b>
 
-              <button
-                onClick={() => act(report._id, 'dismissed')}
-                className="btn-lime rounded-xl px-3 py-2 font-black"
-              >
-                Dismiss / Not harmful
-              </button>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${statusClass(
+                      report.status
+                    )}`}
+                  >
+                    {report.status}
+                  </span>
+                </div>
+
+                <p className="mt-2 text-sm muted">
+                  {promptInfo.description}
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-2 text-xs font-black">
+                  <span className="rounded-full border border-[var(--line)] px-3 py-1">
+                    {promptInfo.aiTool}
+                  </span>
+
+                  <span className="rounded-full border border-[var(--line)] px-3 py-1">
+                    {promptInfo.category}
+                  </span>
+
+                  <span className="rounded-full border border-[var(--line)] px-3 py-1">
+                    {promptInfo.difficulty}
+                  </span>
+
+                  <span className="rounded-full border border-[var(--line)] px-3 py-1 capitalize">
+                    {promptInfo.visibility}
+                  </span>
+                </div>
+
+                <p className="mt-4 muted">
+                  <span className="font-black text-[var(--text)]">
+                    Report reason:
+                  </span>{' '}
+                  {report.reason}
+                </p>
+
+                <p className="mt-1 muted">
+                  <span className="font-black text-[var(--text)]">
+                    Reporter note:
+                  </span>{' '}
+                  {report.description || 'No description'}
+                </p>
+
+                {report.reporter ? (
+                  <p className="mt-1 text-sm muted">
+                    Reported by {report.reporter.name} · {report.reporter.email}
+                  </p>
+                ) : null}
+              </div>
+
+              {/* Report action buttons */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  disabled={isResolved}
+                  onClick={() => act(report._id, 'removed')}
+                  className={`rounded-xl px-3 py-2 font-black disabled:cursor-not-allowed disabled:opacity-70 ${
+                    isRemoved
+                      ? 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200'
+                      : 'btn-outline'
+                  }`}
+                >
+                  {isRemoved ? 'Removed' : 'Remove Prompt'}
+                </button>
+
+                <button
+                  disabled={isResolved}
+                  onClick={() => act(report._id, 'warned')}
+                  className={`rounded-xl px-3 py-2 font-black disabled:cursor-not-allowed disabled:opacity-70 ${
+                    isWarned
+                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-200'
+                      : 'btn-outline'
+                  }`}
+                >
+                  {isWarned ? 'Warned' : 'Warn Creator'}
+                </button>
+
+                <button
+                  disabled={isResolved}
+                  onClick={() => act(report._id, 'dismissed')}
+                  className={`rounded-xl px-3 py-2 font-black disabled:cursor-not-allowed disabled:opacity-70 ${
+                    isDismissed
+                      ? 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200'
+                      : 'btn-lime'
+                  }`}
+                >
+                  {isDismissed ? 'Dismissed' : 'Dismiss / Not harmful'}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Empty state if no reports are submitted */}
         {reports.length === 0 ? (
