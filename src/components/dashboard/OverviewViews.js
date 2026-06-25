@@ -70,7 +70,7 @@ export function Profile() {
       </h2>
 
       <div className="mt-5 flex flex-col gap-5 sm:flex-row">
-        {/* User profile image or initials */}
+        {/* User profile image*/}
         <div className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-pink-500 text-2xl font-black text-white">
           {user.photoURL ? (
             <img
