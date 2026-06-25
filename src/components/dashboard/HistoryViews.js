@@ -1,5 +1,7 @@
 'use client';
 
+import { toast } from 'react-toastify';
+import { api } from '@/libs/api.js';
 import { Empty, Pagination } from './primitives.js';
 
 function formatDate(value) {
@@ -14,6 +16,30 @@ function prettifyAction(value = '') {
     .filter(Boolean)
     .map((word) => word[0]?.toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+function actionBadgeClass(action = '') {
+  if (action.includes('copied')) {
+    return 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-200';
+  }
+
+  if (action.includes('bookmark')) {
+    return 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200';
+  }
+
+  if (action.includes('reported')) {
+    return 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200';
+  }
+
+  if (action.includes('review')) {
+    return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-200';
+  }
+
+  if (action.includes('prompt')) {
+    return 'bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-200';
+  }
+
+  return 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-white';
 }
 
 export function NotificationHistory({ data, page, setPage }) {
@@ -77,8 +103,23 @@ export function NotificationHistory({ data, page, setPage }) {
   );
 }
 
-export function ActivityLog({ data, page, setPage }) {
+export function ActivityLog({ data, page, setPage, load }) {
   const entries = data.entries || [];
+
+  const removeActivity = async (id) => {
+    if (!confirm('Remove this item from your activity log?')) return;
+
+    try {
+      await api(`/dashboard/activity/${id}`, {
+        method: 'DELETE',
+      });
+
+      toast.success('Activity removed');
+      await load?.();
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div>
@@ -87,33 +128,52 @@ export function ActivityLog({ data, page, setPage }) {
       </h2>
 
       <p className="mt-2 muted">
-        Your activity history is stored for 30 days.
+        Your activity history is stored for 30 days. You can also remove activity items manually.
       </p>
 
       <div className="mt-5 grid gap-3">
         {entries.map((item) => (
           <div
-            className="soft-card rounded-3xl p-5"
+            className="soft-card relative rounded-3xl p-5"
             key={item._id}
           >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
+            <button
+              type="button"
+              onClick={() => removeActivity(item._id)}
+              className="absolute right-4 top-4 rounded-full border border-[var(--line)] px-3 py-1 text-sm font-black transition hover:bg-red-500 hover:text-white"
+              title="Remove from activity log"
+            >
+              ×
+            </button>
+
+            <div className="pr-10">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg font-black">
-                  {prettifyAction(item.action)}
+                  {item.title || prettifyAction(item.action)}
                 </h3>
 
-                <p className="mt-2 muted">
-                  {item.summary}
-                </p>
-
-                <p className="mt-3 text-sm muted">
-                  {formatDate(item.createdAt)}
-                </p>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${actionBadgeClass(
+                    item.action
+                  )}`}
+                >
+                  {prettifyAction(item.action)}
+                </span>
               </div>
 
-              <span className="rounded-full border border-[var(--line)] px-3 py-1 text-xs font-black uppercase tracking-[0.12em]">
-                {item.targetType}
-              </span>
+              <p className="mt-2 muted">
+                {item.summary}
+              </p>
+
+              {item.relatedPrompt ? (
+                <p className="mt-2 text-sm muted">
+                  Related prompt: {item.relatedPrompt.title}
+                </p>
+              ) : null}
+
+              <p className="mt-3 text-sm muted">
+                {formatDate(item.createdAt)}
+              </p>
             </div>
           </div>
         ))}
