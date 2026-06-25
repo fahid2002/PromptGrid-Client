@@ -278,6 +278,7 @@ function View({ view, data, load, user, page, setPage }) {
         data={data}
         page={page}
         setPage={setPage}
+        load={load}
       />
     );
   }
