@@ -164,11 +164,50 @@ body.dark-mode {
   border-color: rgba(255, 255, 255, .11);
 }
 
+/* Keep admin status labels readable in light mode, including disabled buttons. */
+.admin-status-button {
+  opacity: 1 !important;
+}
+
+.admin-status-button.approved {
+  color: #166534 !important;
+}
+
+.admin-status-button.featured {
+  color: #6b21a8 !important;
+}
+
+.dark-mode .admin-status-button.approved {
+  color: #bbf7d0 !important;
+}
+
+.dark-mode .admin-status-button.featured {
+  color: #e9d5ff !important;
+}
+
+.admin-status-badge.approved {
+  color: #166534 !important;
+}
+
+.admin-status-badge.featured {
+  color: #6b21a8 !important;
+}
+
+.dark-mode .admin-status-badge.approved {
+  color: #bbf7d0 !important;
+}
+
+.dark-mode .admin-status-badge.featured {
+  color: #e9d5ff !important;
+}
+
 /* Assistant conversation surfaces */
 .assistant-message {
-  display: inline-block !important;
+  display: block !important;
   align-self: flex-start;
-  width: fit-content;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 88%;
   height: auto !important;
   max-height: none;
   overflow: visible;
@@ -179,6 +218,14 @@ body.dark-mode {
   border: 1px solid rgba(100, 116, 139, .18);
   color: #1e293b;
   box-shadow: 0 4px 14px rgba(15, 23, 42, .08);
+}
+
+.assistant-message-content {
+  display: block;
+  height: auto !important;
+  max-height: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .dark-mode .assistant-message {

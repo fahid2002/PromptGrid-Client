@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- profile URLs are user-provided at runtime */
 
 import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -200,6 +201,9 @@ function Dashboard() {
 }
 
 function Sidebar({ user, view, roleRoutes }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isAdmin = user.role === 'admin';
+
   return (
     <aside className="border-b border-(--line) p-5 lg:border-b-0 lg:border-r">
       {/* User profile card */}
@@ -225,12 +229,34 @@ function Sidebar({ user, view, roleRoutes }) {
         </div>
       </div>
 
+      {isAdmin ? (
+        <button
+          type="button"
+          className="dashboard-mobile-menu-toggle mb-3 flex w-full items-center justify-between rounded-2xl border border-(--line) px-4 py-3 text-left font-black lg:hidden"
+          aria-expanded={menuOpen}
+          aria-controls="dashboard-sidebar-navigation"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span>Admin menu</span>
+          <ChevronLeft
+            className={`h-5 w-5 transition-transform ${menuOpen ? '-rotate-90' : ''}`}
+            aria-hidden="true"
+          />
+        </button>
+      ) : null}
+
       {/* Sidebar navigation links */}
-      <nav className="grid gap-2 text-sm font-extrabold">
+      <nav
+        id="dashboard-sidebar-navigation"
+        className={`${isAdmin && !menuOpen ? 'hidden lg:grid' : 'grid'} gap-2 text-sm font-extrabold`}
+      >
         {roleRoutes.map(([label, path]) => (
           <Link
             key={label}
             href={path ? `/dashboard/${path}` : '/dashboard'}
+            onClick={() => {
+              if (isAdmin) setMenuOpen(false);
+            }}
             className={`rounded-2xl px-4 py-3 ${
               view === path
                 ? 'bg-(--lime) text-slate-950'

@@ -158,15 +158,29 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="btn-outline icon-button grid lg:hidden"
-            aria-label={open ? 'Close menu' : 'Open menu'}
-            aria-expanded={open}
-          >
-            {open ? <X /> : <Menu />}
-          </button>
+          {/* Mobile actions kept visible beside the logo */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="btn-outline icon-button rounded-full p-2.5"
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+
+            {user ? <NotificationBell /> : null}
+
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              className="btn-outline icon-button grid"
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-expanded={open}
+            >
+              {open ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile navigation menu */}
@@ -186,7 +200,6 @@ export default function Header() {
               <div className="my-1 border-t border-[#17192d]/15" />
               {user ? (
                 <>
-                  <div className="flex justify-end px-2"><NotificationBell /></div>
                   <Link
                     onClick={() => setOpen(false)}
                     href="/dashboard"

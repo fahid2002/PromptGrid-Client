@@ -212,9 +212,9 @@ export function AdminPrompts({ data, load, page, setPage }) {
 
                   <div className="mt-2 flex flex-wrap gap-2">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${
+                      className={`admin-status-badge rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${
                         isApproved
-                          ? 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200'
+                          ? 'approved bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200'
                           : isRejected
                             ? 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200'
                             : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-200'
@@ -224,7 +224,7 @@ export function AdminPrompts({ data, load, page, setPage }) {
                     </span>
 
                     {isFeatured ? (
-                      <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-purple-700 dark:bg-purple-500/15 dark:text-purple-200">
+                      <span className="admin-status-badge featured rounded-full bg-purple-100 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-purple-700 dark:bg-purple-500/15 dark:text-purple-200">
                         Featured
                       </span>
                     ) : null}
@@ -243,11 +243,12 @@ export function AdminPrompts({ data, load, page, setPage }) {
                   <button
                     disabled={isApproved}
                     onClick={() => moderate(item._id, 'approve')}
-                    className={`rounded-xl px-3 py-2 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                    className={`rounded-xl px-3 py-2 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-100 ${
                       isApproved
-                        ? 'border border-green-400/40 bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-200'
+                        ? 'admin-status-button approved border border-green-400/40 bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-200'
                         : 'btn-lime'
                     }`}
+                    style={isApproved ? { color: '#166534', opacity: 1 } : undefined}
                   >
                     {isApproved ? 'Approved' : 'Approve'}
                   </button>
@@ -269,11 +270,12 @@ export function AdminPrompts({ data, load, page, setPage }) {
                     onClick={() =>
                       moderate(item._id, isFeatured ? 'unfeature' : 'feature')
                     }
-                    className={`rounded-xl px-3 py-2 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                    className={`rounded-xl px-3 py-2 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-100 ${
                       isFeatured
-                        ? 'border border-purple-400/40 bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-200'
+                        ? 'admin-status-button featured border border-purple-400/40 bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-200'
                         : 'btn-outline'
                     }`}
+                    style={isFeatured ? { color: '#6b21a8', opacity: 1 } : undefined}
                     title={
                       isApproved
                         ? ''

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Play, Search, ShieldCheck, Sparkles, WandSparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronLeft, Play, Search, ShieldCheck, Sparkles, WandSparkles } from 'lucide-react';
 import { useState } from 'react';
 import { api } from '@/libs/api.js';
 
@@ -31,11 +31,12 @@ export default function AiToolsClient() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [toolsOpen, setToolsOpen] = useState(false);
 
   const activeTool = tools.find((tool) => tool.id === active);
   const ActiveIcon = activeTool.icon;
 
-  function chooseTool(id) { setActive(id); setResult(null); setError(''); }
+  function chooseTool(id) { setActive(id); setResult(null); setError(''); setToolsOpen(false); }
 
   async function submit(event) {
     event.preventDefault();
@@ -57,7 +58,30 @@ export default function AiToolsClient() {
     </header>
 
     <div className="grid gap-6 lg:grid-cols-[290px_1fr]">
-      <aside className="grid content-start gap-3"><p className="px-1 text-xs font-medium uppercase tracking-[.16em] muted">Choose a tool</p>{tools.map(({ id, title: toolTitle, icon: Icon, eyebrow }) => <button key={id} type="button" aria-pressed={active === id} onClick={() => chooseTool(id)} className={`group rounded-[1.5rem] border p-4 text-left transition ${active === id ? 'border-[var(--line)] bg-[var(--lime)] text-slate-950 shadow-[5px_5px_0_var(--line)]' : 'border-[var(--line)]/15 bg-white/60 hover:-translate-y-0.5 hover:border-[var(--purple)]/40 hover:bg-white dark:bg-white/[.04] dark:hover:bg-white/[.08]'}`}><div className="flex items-start justify-between gap-3"><span className={`grid h-10 w-10 place-items-center rounded-xl ${active === id ? 'bg-white/60' : 'bg-[var(--lime)]/90 text-slate-950'}`}><Icon className="h-5 w-5" /></span>{active === id ? <CheckCircle2 className="h-5 w-5" /> : null}</div><p className="mt-4 text-xs font-medium uppercase tracking-[.14em] opacity-70">{eyebrow}</p><p className="mt-1 text-base font-semibold">{toolTitle}</p></button>)}</aside>
+      <aside className="content-start">
+        <button
+          type="button"
+          className="mb-3 flex w-full items-center justify-between rounded-2xl border border-[var(--line)]/25 bg-[var(--card)] px-4 py-3 text-left font-semibold shadow-sm dark:bg-white/[.08] lg:hidden"
+          aria-expanded={toolsOpen}
+          aria-controls="ai-tools-navigation"
+          onClick={() => setToolsOpen((open) => !open)}
+        >
+          <span>AI tools menu</span>
+          <ChevronLeft
+            className={`h-5 w-5 transition-transform ${toolsOpen ? '-rotate-90' : ''}`}
+            aria-hidden="true"
+          />
+        </button>
+
+        <nav
+          id="ai-tools-navigation"
+          className={`${toolsOpen ? 'grid' : 'hidden lg:grid'} gap-3`}
+          aria-label="AI tools"
+        >
+          <p className="px-1 text-xs font-medium uppercase tracking-[.16em] muted">Choose a tool</p>
+          {tools.map(({ id, title: toolTitle, icon: Icon, eyebrow }) => <button key={id} type="button" aria-pressed={active === id} onClick={() => chooseTool(id)} className={`group rounded-[1.5rem] border p-4 text-left transition ${active === id ? 'border-[var(--line)] bg-[var(--lime)] text-slate-950 shadow-[5px_5px_0_var(--line)]' : 'border-[var(--line)]/15 bg-white/60 hover:-translate-y-0.5 hover:border-[var(--purple)]/40 hover:bg-white dark:bg-white/[.04] dark:hover:bg-white/[.08]'}`}><div className="flex items-start justify-between gap-3"><span className={`grid h-10 w-10 place-items-center rounded-xl ${active === id ? 'bg-white/60' : 'bg-[var(--lime)]/90 text-slate-950'}`}><Icon className="h-5 w-5" /></span>{active === id ? <CheckCircle2 className="h-5 w-5" /> : null}</div><p className="mt-4 text-xs font-medium uppercase tracking-[.14em] opacity-70">{eyebrow}</p><p className="mt-1 text-base font-semibold">{toolTitle}</p></button>)}
+        </nav>
+      </aside>
 
       <section className="hard-card rounded-[2rem] p-5 sm:p-8">
         <div className="flex items-start gap-4 border-b border-[var(--line)]/10 pb-6"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[var(--lime)] text-slate-950 shadow-[3px_3px_0_var(--line)]"><ActiveIcon className="h-6 w-6" /></span><div><p className="text-xs font-medium uppercase tracking-[.16em] text-[var(--purple)]">{activeTool.eyebrow}</p><h2 className="mt-1 font-display text-2xl font-black">{copy[active].title}</h2><p className="muted mt-1 leading-7">{copy[active].text}</p></div></div>
