@@ -1,4 +1,5 @@
 import AiToolsClient from '@/components/ai/AiToolsClient.js';
+import { PrivateRoute } from '@/libs/auth-context.js';
 
 export const metadata = {
   title: 'AI Tools | PromptGrid',
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function AiToolsPage() {
-  return <AiToolsClient />;
+  return (
+    <PrivateRoute>
+      <AiToolsClient />
+    </PrivateRoute>
+  );
 }

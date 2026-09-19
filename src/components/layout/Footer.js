@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useAuth } from '@/libs/auth-context.js';
 
 export default function Footer() {
+  const { user } = useAuth();
+
   return (
     <footer className="border-t border-[var(--line)] px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.4fr_repeat(3,1fr)]">
@@ -41,34 +46,20 @@ export default function Footer() {
               Pricing
             </Link>
 
-            <Link href="/dashboard">
-              Dashboard
-            </Link>
+            {user ? <Link href="/dashboard">Dashboard</Link> : null}
           </div>
         </div>
 
-        {/* Resource links */}
+        {/* Legal links */}
         <div>
           <h4 className="font-black">
-            Resources
+            Legal
           </h4>
 
           <div className="mt-4 grid gap-2 text-sm muted">
-            <span>
-              Creator Guide
-            </span>
-
-            <span>
-              Moderation
-            </span>
-
-            <span>
-              Privacy
-            </span>
-
-            <span>
-              Terms
-            </span>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
+            <Link href="/faq">FAQ</Link>
           </div>
         </div>
 

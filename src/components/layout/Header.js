@@ -9,18 +9,22 @@ import { api } from '@/libs/api.js';
 import { useAuth } from '@/libs/auth-context.js';
 import NotificationBell from '@/components/notifications/NotificationBell.js';
 
-// Header navigation links
-const links = [
+// Navigation links available to every visitor
+const publicLinks = [
   ['Home', '/'],
   ['All Prompts', '/all-prompts'],
   ['AI Tools', '/ai-tools'],
   ['Pricing', '/payment'],
-  ['Dashboard', '/dashboard'],
 ];
 
 export default function Header() {
   // Get current user and user setter from auth context
   const { user, setUser } = useAuth();
+
+  // Dashboard is only visible after authentication
+  const links = user
+    ? [...publicLinks, ['Dashboard', '/dashboard']]
+    : publicLinks;
 
   // Get current pathname for active nav link
   const pathname = usePathname();

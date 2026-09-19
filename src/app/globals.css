@@ -79,6 +79,27 @@ body.dark-mode {
   color: var(--muted);
 }
 
+/* PromptGrid-themed scrollbar for assistant conversation history */
+.promptgrid-scrollbar {
+  scrollbar-color: var(--lime) rgba(23, 25, 45, .35);
+  scrollbar-width: thin;
+}
+
+.promptgrid-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.promptgrid-scrollbar::-webkit-scrollbar-track {
+  background: rgba(23, 25, 45, .28);
+  border-radius: 999px;
+}
+
+.promptgrid-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--lime);
+  border: 2px solid rgba(23, 25, 45, .28);
+  border-radius: 999px;
+}
+
 /* Auth surfaces that intentionally remain light in both themes */
 .auth-light-surface {
   color: #17192d;
@@ -141,6 +162,39 @@ body.dark-mode {
 .dark-mode .soft-card {
   background: rgba(15, 23, 42, .58);
   border-color: rgba(255, 255, 255, .11);
+}
+
+/* Assistant conversation surfaces */
+.assistant-message {
+  display: inline-block !important;
+  align-self: flex-start;
+  width: fit-content;
+  height: auto !important;
+  max-height: none;
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-height: 0;
+  background: #e2e8f0;
+  border: 1px solid rgba(100, 116, 139, .18);
+  color: #1e293b;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .08);
+}
+
+.dark-mode .assistant-message {
+  background: rgba(30, 41, 59, .86);
+  border-color: rgba(255, 255, 255, .08);
+  color: #f8fafc;
+  box-shadow: none;
+}
+
+.assistant-input-shell {
+  background: #f8fafc;
+  color: var(--ink);
+}
+
+.dark-mode .assistant-input-shell {
+  background: rgba(30, 41, 59, .92);
 }
 
 /* Lime filled button */
@@ -348,12 +402,23 @@ textarea {
   outline: none;
 }
 
+.input-box::placeholder,
+textarea::placeholder {
+  color: #7b8499;
+  opacity: 1;
+}
+
 /* Inputs, select and textarea dark mode */
 .dark-mode .input-box,
 .dark-mode select,
 .dark-mode textarea {
   background: rgba(30, 41, 59, .92);
   border-color: rgba(255, 255, 255, .18);
+}
+
+.dark-mode .input-box::placeholder,
+.dark-mode textarea::placeholder {
+  color: #a7b0c4;
 }
 
 /* Loading skeleton base */
