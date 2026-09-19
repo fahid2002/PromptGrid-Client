@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './globals.css';
 import Footer from '@/components/layout/Footer.js';
 import Header from '@/components/layout/Header.js';
+import AiAssistant from '@/components/ai/AiAssistant.js';
 import Providers from '@/components/layout/Providers.js';
 
 // Main body font
@@ -34,6 +35,8 @@ export default function RootLayout({ children }) {
         <Providers>
           {/* Main navigation header */}
           <Header />
+
+          <AiAssistant />
 
           {/* Page content */}
           <main>

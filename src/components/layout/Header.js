@@ -13,10 +13,9 @@ import NotificationBell from '@/components/notifications/NotificationBell.js';
 const links = [
   ['Home', '/'],
   ['All Prompts', '/all-prompts'],
-  ['Trending', '/#featured'],
-  ['Creators', '/#creators'],
-  ['Dashboard', '/dashboard'],
+  ['AI Tools', '/ai-tools'],
   ['Pricing', '/payment'],
+  ['Dashboard', '/dashboard'],
 ];
 
 export default function Header() {
@@ -95,7 +94,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop navigation */}
-          <nav className="hidden items-center gap-7 text-sm font-extrabold lg:flex">
+          <nav className="hidden items-center gap-7 text-sm font-normal lg:flex">
             {links.map(([label, href]) => (
               <Link
                 key={label}
@@ -124,14 +123,14 @@ export default function Header() {
                 <NotificationBell />
                 <Link
                   href="/dashboard"
-                  className="btn-outline rounded-2xl px-4 py-3 text-sm font-black"
+                  className="btn-outline rounded-2xl px-4 py-3 text-sm font-normal"
                 >
                   {user.name.split(' ')[0]} · {user.role}
                 </Link>
 
                 <button
                   onClick={logout}
-                  className="btn-lime rounded-2xl px-5 py-3 text-sm font-black"
+                  className="btn-lime rounded-2xl px-5 py-3 text-sm font-normal"
                 >
                   Logout
                 </button>
@@ -140,14 +139,14 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className="btn-outline rounded-2xl px-5 py-3 text-sm font-black"
+                  className="btn-outline rounded-2xl px-5 py-3 text-sm font-normal"
                 >
                   Log in
                 </Link>
 
                 <Link
                   href="/register"
-                  className="btn-lime rounded-2xl px-5 py-3 text-sm font-black"
+                  className="btn-lime rounded-2xl px-5 py-3 text-sm font-normal"
                 >
                   Start creating
                 </Link>
@@ -175,7 +174,7 @@ export default function Header() {
                   onClick={() => setOpen(false)}
                   key={label}
                   href={href}
-                  className="rounded-2xl p-3 font-bold"
+                  className="rounded-2xl p-3 font-normal"
                 >
                   {label}
                 </Link>
@@ -187,7 +186,7 @@ export default function Header() {
                   <Link
                     onClick={() => setOpen(false)}
                     href="/dashboard"
-                    className="btn-outline rounded-2xl px-4 py-3 text-center text-sm font-black"
+                    className="btn-outline rounded-2xl px-4 py-3 text-center text-sm font-normal"
                   >
                     {user.name.split(' ')[0]} · {user.role}
                   </Link>
@@ -196,7 +195,7 @@ export default function Header() {
                       setOpen(false);
                       logout();
                     }}
-                    className="btn-lime rounded-2xl px-5 py-3 text-sm font-black"
+                    className="btn-lime rounded-2xl px-5 py-3 text-sm font-normal"
                   >
                     Logout
                   </button>
@@ -206,14 +205,14 @@ export default function Header() {
                   <Link
                     onClick={() => setOpen(false)}
                     href="/login"
-                    className="btn-outline rounded-2xl px-5 py-3 text-center text-sm font-black"
+                    className="btn-outline rounded-2xl px-5 py-3 text-center text-sm font-normal"
                   >
                     Log in
                   </Link>
                   <Link
                     onClick={() => setOpen(false)}
                     href="/register"
-                    className="btn-lime rounded-2xl px-5 py-3 text-center text-sm font-black"
+                    className="btn-lime rounded-2xl px-5 py-3 text-center text-sm font-normal"
                   >
                     Start creating
                   </Link>

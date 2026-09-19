@@ -148,6 +148,7 @@ body.dark-mode {
   background: var(--lime);
   color: #0c1020;
   border: 2px solid var(--line);
+  font-weight: 500;
   box-shadow: 5px 5px 0 var(--line);
   transition: .18s;
 }
@@ -163,6 +164,7 @@ body.dark-mode {
   border: 2px solid var(--line);
   color: var(--ink);
   background: rgba(255, 255, 255, .55);
+  font-weight: 500;
   transition: .18s;
 }
 
