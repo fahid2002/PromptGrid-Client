@@ -269,11 +269,11 @@ export default function AuthForm({ mode }) {
   if (!register) {
     return (
       <section className="px-4 py-10 sm:py-12">
-        <form onSubmit={submit} className="hard-card mx-auto grid max-w-md gap-3 rounded-[2rem] p-6 sm:p-7">
+        <form autoComplete="off" onSubmit={submit} className="hard-card mx-auto grid max-w-md gap-3 rounded-[2rem] p-6 sm:p-7">
           <h1 className="font-display text-3xl font-black">Welcome back</h1>
           <p className="text-sm leading-6 muted">Use the role and account you previously registered.</p>
-          <input required type="email" autoComplete="email" value={form.email} onChange={(event) => update('email', event.target.value)} className="input-box rounded-2xl px-4 py-3" placeholder="Email address" />
-          <input required minLength={8} type="password" autoComplete="current-password" value={form.password} onChange={(event) => update('password', event.target.value)} className="input-box rounded-2xl px-4 py-3" placeholder="Password" />
+          <input required type="email" autoComplete="off" value={form.email} onChange={(event) => update('email', event.target.value)} className="input-box rounded-2xl px-4 py-3" placeholder="Email address" />
+          <input required minLength={8} type="password" autoComplete="new-password" value={form.password} onChange={(event) => update('password', event.target.value)} className="input-box rounded-2xl px-4 py-3" placeholder="Password" />
           <RoleSelector value={form.role} onChange={(role) => update('role', role)} includeAdmin compact />
           <button disabled={submitting} className="btn-lime rounded-2xl px-5 py-3 font-black disabled:cursor-not-allowed disabled:opacity-60">{submitting ? 'Logging in...' : 'Log in'}</button>
           <Link className="auth-link text-center text-sm underline" href="/forgot-password">Forgot your password?</Link>

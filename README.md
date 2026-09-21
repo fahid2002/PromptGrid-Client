@@ -40,6 +40,7 @@ Next.js App Router frontend for **PromptGrid**, an AI Prompt Sharing & Marketpla
 * Semantic Prompt Search by meaning
 * Authenticated PromptGrid AI Assistant with typing state and chat history
 * Optional TOTP-based multi-factor authentication setup and login verification
+* Login form does not bundle or prefill administrator credentials
 * Responsive collapsible menus for dashboard, AI Tools, and marketplace filters
 * Responsive mobile header actions for theme and notifications
 * FAQ, Privacy Policy, and Terms pages
@@ -221,6 +222,8 @@ Profile
 When MFA is enabled, both email/password login and Google login pause at a short-lived verification screen. The user must enter an authenticator code or a recovery code before the server creates a session. During verification the client displays a loading toast so the user can see that authentication is being checked.
 
 The client never receives or stores the MFA secret, encryption key, Gemini API key, JWT secret, database URL, or Stripe secret. Sensitive operations go through the server API proxy with HTTP-only authentication cookies.
+
+The login form intentionally uses autofill-resistant fields. Administrator credentials are provided separately by the project owner and are never hardcoded into the client bundle.
 
 ## Responsive Experience
 
