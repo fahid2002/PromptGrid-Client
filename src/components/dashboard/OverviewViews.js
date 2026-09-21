@@ -10,6 +10,7 @@ import { useAuth } from '@/libs/auth-context.js';
 import { initials, isChartData } from '@/libs/utils.js';
 import { AnalyticsChart, Stats } from './primitives.js';
 import { MfaSettings } from './MfaSettings.js';
+import { PasswordSettings } from './PasswordSettings.js';
 
 export function DashboardHome({ data }) {
   // Use summary first, then stats, otherwise use the full data object
@@ -119,6 +120,7 @@ export function Profile() {
       ) : null}
 
       <MfaSettings />
+      <PasswordSettings />
     </div>
   );
 }

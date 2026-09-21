@@ -26,6 +26,9 @@ export default function AuthForm({ mode }) {
   const [mfaCode, setMfaCode] = useState('');
   const [mfaRecoveryCode, setMfaRecoveryCode] = useState('');
   const [useRecoveryCode, setUseRecoveryCode] = useState(false);
+  const [emailMfaMode, setEmailMfaMode] = useState(false);
+  const [emailMfaSent, setEmailMfaSent] = useState(false);
+  const [emailMfaCode, setEmailMfaCode] = useState('');
   const previewURLRef = useRef('');
   const { setUser } = useAuth();
   const router = useRouter();
@@ -151,16 +154,58 @@ export default function AuthForm({ mode }) {
     }
   };
 
+  const sendEmailMfaCode = async () => {
+    setSubmitting(true);
+    try {
+      await api('/auth/mfa/send-email-login', {
+        method: 'POST',
+        body: JSON.stringify({ challengeToken: mfaChallenge.challengeToken }),
+      });
+      setEmailMfaMode(true);
+      setEmailMfaSent(true);
+      toast.success('A verification code was sent to your account email.');
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const verifyEmailMfaLogin = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    const verificationToast = toast.loading('Checking your email verification code...');
+    try {
+      const data = await api('/auth/mfa/verify-email-login', {
+        method: 'POST',
+        body: JSON.stringify({ challengeToken: mfaChallenge.challengeToken, code: emailMfaCode }),
+      });
+      setUser(data.user);
+      toast.update(verificationToast, { render: `Welcome back, ${data.user.name}.`, type: 'success', isLoading: false, autoClose: 3000 });
+      router.replace(authDestination('login'));
+      router.refresh();
+    } catch (error) {
+      toast.update(verificationToast, { render: error.message, type: 'error', isLoading: false, autoClose: 5000 });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (!register && mfaChallenge) {
     return (
       <section className="px-4 py-10 sm:py-12">
         <form onSubmit={verifyMfaLogin} className="hard-card mx-auto grid max-w-md gap-3 rounded-[2rem] p-6 sm:p-7">
           <h1 className="font-display text-3xl font-black">Two-factor verification</h1>
           <p className="text-sm leading-6 muted">
-            Enter the 6-digit code from your authenticator app to finish signing in.
+            Verify with your authenticator app, or request a code at your account email.
           </p>
 
-          {useRecoveryCode ? (
+          {emailMfaMode ? (
+            <div className="grid gap-3">
+              <input required inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={emailMfaCode} onChange={(event) => setEmailMfaCode(event.target.value.replace(/\D/g, ''))} className="input-box rounded-2xl px-4 py-3 text-center tracking-[.4em]" placeholder="000000" autoComplete="one-time-code" />
+              <button type="button" disabled={submitting} onClick={verifyEmailMfaLogin} className="btn-lime rounded-2xl px-5 py-3 font-black disabled:opacity-60">{submitting ? 'Verifying...' : 'Verify email code'}</button>
+            </div>
+          ) : useRecoveryCode ? (
             <input
               required
               value={mfaRecoveryCode}
@@ -183,17 +228,25 @@ export default function AuthForm({ mode }) {
             />
           )}
 
-          <button disabled={submitting} className="btn-lime rounded-2xl px-5 py-3 font-black disabled:opacity-60">
+          {!emailMfaMode ? <button disabled={submitting} className="btn-lime rounded-2xl px-5 py-3 font-black disabled:opacity-60">
             {submitting ? 'Verifying...' : 'Verify and log in'}
-          </button>
+          </button> : null}
 
-          <button
+          {!emailMfaMode ? <button type="button" disabled={submitting} onClick={sendEmailMfaCode} className="btn-outline rounded-2xl px-5 py-3 text-sm disabled:opacity-60">
+            {emailMfaSent ? 'Send another email code' : 'Use email verification code'}
+          </button> : null}
+
+          {!emailMfaMode ? <button
             type="button"
             className="btn-outline rounded-2xl px-5 py-3 text-sm"
             onClick={() => setUseRecoveryCode((current) => !current)}
           >
             {useRecoveryCode ? 'Use authenticator code' : 'Use a recovery code'}
-          </button>
+          </button> : null}
+
+          {emailMfaMode ? <button type="button" className="text-sm underline muted" onClick={() => { setEmailMfaMode(false); setEmailMfaCode(''); }}>
+            Use authenticator app instead
+          </button> : null}
 
           <button
             type="button"
@@ -202,6 +255,8 @@ export default function AuthForm({ mode }) {
               setMfaChallenge(null);
               setMfaCode('');
               setMfaRecoveryCode('');
+              setEmailMfaMode(false);
+              setEmailMfaCode('');
             }}
           >
             Back to login
@@ -221,6 +276,7 @@ export default function AuthForm({ mode }) {
           <input required minLength={8} type="password" autoComplete="current-password" value={form.password} onChange={(event) => update('password', event.target.value)} className="input-box rounded-2xl px-4 py-3" placeholder="Password" />
           <RoleSelector value={form.role} onChange={(role) => update('role', role)} includeAdmin compact />
           <button disabled={submitting} className="btn-lime rounded-2xl px-5 py-3 font-black disabled:cursor-not-allowed disabled:opacity-60">{submitting ? 'Logging in...' : 'Log in'}</button>
+          <Link className="auth-link text-center text-sm underline" href="/forgot-password">Forgot your password?</Link>
           {form.role !== 'admin' ? <GoogleAuthButton configured={googleConfigured} onSuccess={google} errorMessage="Google login failed. Please try again." /> : null}
           {form.role === 'admin' ? <p className="auth-light-surface rounded-xl bg-[#f4f6ff] p-3 text-center text-xs font-bold">Administrators use the fixed email and password. Google login is disabled for Admin.</p> : null}
           <p className="text-center text-sm muted">Not registered? <Link className="auth-link font-black underline" href="/register">Create an account</Link></p>
