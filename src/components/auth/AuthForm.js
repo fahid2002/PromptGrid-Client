@@ -22,6 +22,10 @@ export default function AuthForm({ mode }) {
   const [editorSource, setEditorSource] = useState(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [mfaChallenge, setMfaChallenge] = useState(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaRecoveryCode, setMfaRecoveryCode] = useState('');
+  const [useRecoveryCode, setUseRecoveryCode] = useState(false);
   const previewURLRef = useRef('');
   const { setUser } = useAuth();
   const router = useRouter();
@@ -68,6 +72,10 @@ export default function AuthForm({ mode }) {
         router.refresh();
       } else {
         const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email: form.email, password: form.password, role: form.role }) });
+        if (data.mfaRequired) {
+          setMfaChallenge(data);
+          return;
+        }
         setUser(data.user);
         toast.success(`Welcome back, ${data.user.name}.`);
         router.replace(authDestination('login'));
@@ -92,6 +100,10 @@ export default function AuthForm({ mode }) {
         setUser(null);
         toast.success(`Google ${data.user.role} account created. Please log in.`);
       } else {
+        if (data.mfaRequired) {
+          setMfaChallenge(data);
+          return;
+        }
         setUser(data.user);
         toast.success(`Welcome back, ${data.user.name}.`);
       }
@@ -101,6 +113,92 @@ export default function AuthForm({ mode }) {
       toast.error(error.message);
     }
   };
+
+  const verifyMfaLogin = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const data = await api('/auth/mfa/verify-login', {
+        method: 'POST',
+        body: JSON.stringify({
+          challengeToken: mfaChallenge.challengeToken,
+          ...(useRecoveryCode
+            ? { recoveryCode: mfaRecoveryCode }
+            : { code: mfaCode }),
+        }),
+      });
+
+      setUser(data.user);
+      toast.success(`Welcome back, ${data.user.name}.`);
+      router.replace(authDestination('login'));
+      router.refresh();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!register && mfaChallenge) {
+    return (
+      <section className="px-4 py-10 sm:py-12">
+        <form onSubmit={verifyMfaLogin} className="hard-card mx-auto grid max-w-md gap-3 rounded-[2rem] p-6 sm:p-7">
+          <h1 className="font-display text-3xl font-black">Two-factor verification</h1>
+          <p className="text-sm leading-6 muted">
+            Enter the 6-digit code from your authenticator app to finish signing in.
+          </p>
+
+          {useRecoveryCode ? (
+            <input
+              required
+              value={mfaRecoveryCode}
+              onChange={(event) => setMfaRecoveryCode(event.target.value)}
+              className="input-box rounded-2xl px-4 py-3"
+              placeholder="Recovery code"
+              autoComplete="one-time-code"
+            />
+          ) : (
+            <input
+              required
+              inputMode="numeric"
+              pattern="[0-9]{6}"
+              maxLength={6}
+              value={mfaCode}
+              onChange={(event) => setMfaCode(event.target.value.replace(/\D/g, ''))}
+              className="input-box rounded-2xl px-4 py-3 text-center tracking-[.4em]"
+              placeholder="000000"
+              autoComplete="one-time-code"
+            />
+          )}
+
+          <button disabled={submitting} className="btn-lime rounded-2xl px-5 py-3 font-black disabled:opacity-60">
+            {submitting ? 'Verifying...' : 'Verify and log in'}
+          </button>
+
+          <button
+            type="button"
+            className="btn-outline rounded-2xl px-5 py-3 text-sm"
+            onClick={() => setUseRecoveryCode((current) => !current)}
+          >
+            {useRecoveryCode ? 'Use authenticator code' : 'Use a recovery code'}
+          </button>
+
+          <button
+            type="button"
+            className="text-sm underline muted"
+            onClick={() => {
+              setMfaChallenge(null);
+              setMfaCode('');
+              setMfaRecoveryCode('');
+            }}
+          >
+            Back to login
+          </button>
+        </form>
+      </section>
+    );
+  }
 
   if (!register) {
     return (

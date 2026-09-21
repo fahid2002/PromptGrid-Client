@@ -9,6 +9,7 @@ import { api } from '@/libs/api.js';
 import { useAuth } from '@/libs/auth-context.js';
 import { initials, isChartData } from '@/libs/utils.js';
 import { AnalyticsChart, Stats } from './primitives.js';
+import { MfaSettings } from './MfaSettings.js';
 
 export function DashboardHome({ data }) {
   // Use summary first, then stats, otherwise use the full data object
@@ -116,6 +117,8 @@ export function Profile() {
           Upgrade to Premium
         </Link>
       ) : null}
+
+      <MfaSettings />
     </div>
   );
 }

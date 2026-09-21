@@ -33,6 +33,17 @@ Next.js App Router frontend for **PromptGrid**, an AI Prompt Sharing & Marketpla
 * Analytics charts with Recharts
 * Toast notifications with React Toastify
 * Framer Motion animations
+* Protected AI Tools workspace with Gemini-powered tools
+* Prompt Builder and Optimizer
+* Prompt Playground for testing prompts with custom input
+* AI Prompt Review for safety and quality feedback
+* Semantic Prompt Search by meaning
+* Authenticated PromptGrid AI Assistant with typing state and chat history
+* Optional TOTP-based multi-factor authentication setup and login verification
+* Responsive collapsible menus for dashboard, AI Tools, and marketplace filters
+* Responsive mobile header actions for theme and notifications
+* FAQ, Privacy Policy, and Terms pages
+* GitHub and LinkedIn social links in the footer
 
 ## Tech Stack
 
@@ -146,7 +157,26 @@ This keeps frontend API calls clean and helps authentication cookies work correc
 /dashboard         User, creator, and admin dashboard
 /payment           Premium payment page
 /payment/success   Payment success page
+/ai-tools          Private Gemini AI tools workspace
+/faq               Frequently asked questions
+/privacy           Privacy policy
+/terms             Terms of service
 ```
+
+## AI Tools
+
+The AI Tools route is private and requires authentication. It provides:
+
+```txt
+Prompt Builder      Turn a rough idea into a reusable prompt
+Prompt Playground   Run a prompt against custom input
+Prompt Review       Review safety, quality, and improvement suggestions
+Semantic Search     Find approved public prompts by meaning
+```
+
+The floating PromptGrid Assistant is also available to authenticated users across the main application pages. Chat history is stored per authenticated user in browser storage and is cleared when the user logs out.
+
+AI requests are sent through the client API proxy, so the Gemini API key is never exposed in the browser.
 
 ## Dashboard Access
 
@@ -221,6 +251,13 @@ Before final submission, verify:
 * Google login works
 * Dashboard opens correctly
 * Prompt details page works
+* AI Tools route redirects logged-out users to login
+* Prompt Builder returns an optimized prompt
+* Prompt Playground returns a generated output
+* AI Prompt Review returns safety and quality feedback
+* Semantic Prompt Search returns relevant approved prompts
+* AI Assistant responds for authenticated users
+* AI Assistant closes and clears visible history after logout
 * Premium prompt appears locked for free users
 * Stripe test payment redirects successfully
 * User becomes premium after payment
