@@ -1,7 +1,20 @@
 import { normalizeApiError } from './utils.js';
 
 let refreshPromise = null;
-const noRefreshPaths = new Set(['/auth/login', '/auth/register', '/auth/google', '/auth/refresh']);
+// These endpoints return action-specific 401 responses (invalid MFA code,
+// expired challenge, invalid reset code, etc.). Refreshing here would replace
+// that useful error with a misleading "session expired" message.
+const noRefreshPaths = new Set([
+  '/auth/login',
+  '/auth/register',
+  '/auth/google',
+  '/auth/refresh',
+  '/auth/mfa/verify-login',
+  '/auth/mfa/send-email-login',
+  '/auth/mfa/verify-email-login',
+  '/auth/password/reset/send-code',
+  '/auth/password/reset',
+]);
 
 function requestOptions(options) {
   return {

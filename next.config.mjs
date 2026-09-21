@@ -9,6 +9,22 @@ const apiTarget =
 
 // Next.js configuration
 const nextConfig = {
+  // Google OAuth opens a cross-origin popup and checks whether it closed.
+  // Allowing popups prevents Chromium's COOP warning from blocking that check.
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+        ],
+      },
+    ];
+  },
+
   // Proxy frontend /api requests to backend server
   async rewrites() {
     return [
