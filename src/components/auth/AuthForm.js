@@ -117,6 +117,7 @@ export default function AuthForm({ mode }) {
   const verifyMfaLogin = async (event) => {
     event.preventDefault();
     setSubmitting(true);
+    const verificationToast = toast.loading('Checking your authentication code...');
 
     try {
       const data = await api('/auth/mfa/verify-login', {
@@ -130,11 +131,21 @@ export default function AuthForm({ mode }) {
       });
 
       setUser(data.user);
-      toast.success(`Welcome back, ${data.user.name}.`);
+      toast.update(verificationToast, {
+        render: `Welcome back, ${data.user.name}.`,
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000,
+      });
       router.replace(authDestination('login'));
       router.refresh();
     } catch (error) {
-      toast.error(error.message);
+      toast.update(verificationToast, {
+        render: error.message,
+        type: 'error',
+        isLoading: false,
+        autoClose: 5000,
+      });
     } finally {
       setSubmitting(false);
     }
